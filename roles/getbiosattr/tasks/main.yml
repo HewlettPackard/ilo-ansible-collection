@@ -1,0 +1,10 @@
+---
+# tasks file for getBiosattr
+- name: Get BIOS attributes
+  redfish_info:
+    category: Systems
+    command: GetBiosAttributes
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+  register: result_attr

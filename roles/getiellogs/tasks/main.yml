@@ -1,0 +1,10 @@
+---
+# tasks file for getiellogs
+- name: Get Manager Logs
+  redfish_info:
+    category: Manager
+    command: GetLogs
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+  register: result_attr

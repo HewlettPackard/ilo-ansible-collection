@@ -1,0 +1,11 @@
+---
+# tasks file for updaterole
+- name: Update user role
+  redfish_command:
+    category: Accounts
+    command: UpdateUserRole
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    account_username: "{{ loginname }}"
+    roleid: "{{ roleid }}"

@@ -1,0 +1,11 @@
+---
+# tasks file for updateusername
+- name: Update user name
+  redfish_command:
+    category: Accounts
+    command: UpdateUserName
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    account_username: "{{ account_username }}"
+    account_updatename: "{{ account_updatename }}"

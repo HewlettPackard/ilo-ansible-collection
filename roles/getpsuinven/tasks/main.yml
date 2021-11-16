@@ -1,0 +1,10 @@
+---
+# tasks file for getpsuinven
+- name: Get PSU Inventory
+  redfish_info:
+    category: Chassis
+    command: GetPsuInventory
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+  register: result_attr

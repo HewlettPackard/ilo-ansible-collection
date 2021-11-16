@@ -1,0 +1,39 @@
+---
+- hosts: myhosts
+  connection: local
+  name: Configure HostName
+  gather_facts: False
+  # vars_files: iLO_redfish.yml
+
+  vars:
+    - attribute_name: HostName
+    - attribute_value: ILOSGH924TZ38
+
+  tasks:
+    - name: Create session
+      redfish_command:
+        category: Sessions
+        command: CreateSession
+        baseuri: "{{ baseuri }}"
+        username: "{{ username }}"
+        password: "{{ password }}"
+      register: result
+
+    - name: Set Manager NIC
+      redfish_config:
+        category: Manager
+        command: SetManagerNic
+        nic_config:
+          HostName: "{{ attribute_value }}"
+        baseuri: "{{ baseuri }}"
+        # username: "{{ username }}"
+        # password: "{{ password }}"
+        auth_token: "{{ result.session.token }}"
+
+    - name: Delete session using security token created by CreateSesssion above
+      redfish_command:
+        category: Sessions
+        command: DeleteSession
+        baseuri: "{{ baseuri }}"
+        auth_token: "{{ result.session.token }}"
+        session_uri: "{{ result.session.uri }}"

@@ -1,0 +1,39 @@
+---
+- hosts: myhosts
+  connection: local
+  name: Update user role
+  gather_facts: False
+  # vars_files: iLO_redfish.yml
+
+  vars:
+    - loginname: Bhavya_check2
+    - roleid: Operator #Administrator, ReadOnly, Operator
+
+  tasks:
+    - name: Create session
+      redfish_command:
+        category: Sessions
+        command: CreateSession
+        baseuri: "{{ baseuri }}"
+        username: "{{ username }}"
+        password: "{{ password }}"
+      register: result
+
+    - name: Update user role
+      redfish_command:
+        category: Accounts
+        command: UpdateUserRole
+        baseuri: "{{ baseuri }}"
+        # username: "{{ username }}"
+        # password: "{{ password }}"
+        account_username: "{{ loginname }}"
+        roleid: "{{ roleid }}"
+        auth_token: "{{ result.session.token }}"
+
+    - name: Delete session using security token created by CreateSesssion above
+      redfish_command:
+        category: Sessions
+        command: DeleteSession
+        baseuri: "{{ baseuri }}"
+        auth_token: "{{ result.session.token }}"
+        session_uri: "{{ result.session.uri }}"

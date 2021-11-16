@@ -1,0 +1,10 @@
+---
+# tasks file for getfirminven
+- name: Get Firmware Inventory
+  redfish_info:
+    category: Update
+    command: GetFirmwareInventory
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+  register: result_attr

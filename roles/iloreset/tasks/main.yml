@@ -1,0 +1,9 @@
+---
+# tasks file for iLOreset
+- name: Restart Manager gracefully
+  redfish_command:
+    category: Manager
+    command: GracefulRestart
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"

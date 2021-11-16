@@ -1,0 +1,10 @@
+---
+# tasks file for getchassistherm
+- name: Get chassis thermals
+  redfish_info:
+    category: Chassis
+    command: GetChassisThermals
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+  register: result_attr

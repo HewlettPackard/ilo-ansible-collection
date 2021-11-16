@@ -1,0 +1,10 @@
+---
+# tasks file for getBootoverride
+- name: Get Boot Override information
+  redfish_info:
+    category: Systems
+    command: GetBootOverride
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+  register: result_attr

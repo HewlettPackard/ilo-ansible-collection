@@ -1,0 +1,50 @@
+---
+- hosts: myhosts
+  connection: local
+  name: Set Manager DNS
+  gather_facts: False
+  # vars_files: iLO_redfish.yml
+
+  vars:
+    - dns_server: 0.0.0.0
+    - domain_name: tst.sgp.hp.mfg
+
+  tasks:
+    - name: Create session
+      redfish_command:
+        category: Sessions
+        command: CreateSession
+        baseuri: "{{ baseuri }}"
+        username: "{{ username }}"
+        password: "{{ password }}"
+      register: result
+
+    - name: Set DNS Server to {{ dns_server }}
+      ilo_redfish_config:
+        category: Manager
+        command: SetDNSserver
+        baseuri: "{{ baseuri }}"
+        # username: "{{ username }}"
+        # password: "{{ password }}"
+        attribute_name: DNSServers
+        attribute_value: "{{ dns_server }}"
+        auth_token: "{{ result.session.token }}"
+
+    - name: Set Domain name to {{ domain_name }}
+      ilo_redfish_config:
+        category: Manager
+        command: SetDomainName
+        baseuri: "{{ baseuri }}"
+        # username: "{{ username }}"
+        # password: "{{ password }}"
+        attribute_name: DomainName
+        attribute_value: "{{ domain_name }}"
+        auth_token: "{{ result.session.token }}"
+
+    - name: Delete session using security token created by CreateSesssion above
+      redfish_command:
+        category: Sessions
+        command: DeleteSession
+        baseuri: "{{ baseuri }}"
+        auth_token: "{{ result.session.token }}"
+        session_uri: "{{ result.session.uri }}"

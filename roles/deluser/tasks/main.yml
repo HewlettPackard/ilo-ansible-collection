@@ -1,0 +1,10 @@
+---
+# tasks file for deluser
+- name: Delete user
+  redfish_command:
+    category: Accounts
+    command: DeleteUser
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    account_username: "{{ loginname }}"

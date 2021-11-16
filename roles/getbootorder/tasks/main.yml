@@ -1,0 +1,10 @@
+---
+# tasks file for getBootorder
+- name: Get device boot order
+  redfish_info:
+    category: Systems
+    command: GetBootOrder
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+  register: result_attr

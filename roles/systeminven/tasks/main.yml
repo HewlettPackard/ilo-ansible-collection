@@ -1,0 +1,10 @@
+---
+# tasks file for systeminven
+- name: Getting system inventory
+  redfish_info:
+    category: Systems
+    command: GetSystemInventory
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+  register: result_attr

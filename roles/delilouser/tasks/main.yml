@@ -1,0 +1,10 @@
+---
+# tasks file for Deluser
+- name: Delete user
+  ilo_redfish_command:
+    category: Accounts
+    command: DeliLOuser
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    loginname: "{{ loginname }}"

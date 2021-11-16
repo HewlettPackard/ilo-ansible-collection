@@ -1,0 +1,39 @@
+---
+- hosts: myhosts
+  connection: local
+  name: Set NTP Servers
+  gather_facts: False
+  # vars_files: iLO_redfish.yml
+
+  vars:
+    - attribute_name: StaticNTPServers
+    - attribute_value: 1.2.3.4
+
+  tasks:
+    - name: Create session
+      redfish_command:
+        category: Sessions
+        command: CreateSession
+        baseuri: "{{ baseuri }}"
+        username: "{{ username }}"
+        password: "{{ password }}"
+      register: result
+
+    - name: Set {{ attribute_name }} to {{ attribute_value }}
+      ilo_redfish_config:
+        category: Manager
+        command: SetNTPServers
+        baseuri: "{{ baseuri }}"
+        # username: "{{ username }}"
+        # password: "{{ password }}"
+        attribute_name: "{{ attribute_name }}"
+        attribute_value: "{{ attribute_value }}"
+        auth_token: "{{ result.session.token }}"
+
+    - name: Delete session using security token created by CreateSesssion above
+      redfish_command:
+        category: Sessions
+        command: DeleteSession
+        baseuri: "{{ baseuri }}"
+        auth_token: "{{ result.session.token }}"
+        session_uri: "{{ result.session.uri }}"

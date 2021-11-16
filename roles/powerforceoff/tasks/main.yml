@@ -1,0 +1,9 @@
+---
+# tasks file for powerforceoff
+- name: Turn system power off
+  redfish_command:
+    category: Systems
+    command: PowerForceOff
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"

@@ -1,0 +1,11 @@
+---
+# tasks file for setDomainName
+- name: Set Domain name to {{ domain_name }}
+  ilo_redfish_config:
+    category: Manager
+    command: SetDomainName
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    attribute_name: DomainName
+    attribute_value: "{{ domain_name }}"

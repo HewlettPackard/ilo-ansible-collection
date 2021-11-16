@@ -1,0 +1,74 @@
+---
+- hosts: myhosts
+  connection: local
+  name: Automation testing
+  gather_facts: False
+
+  # vars:
+  #   datatype: ChassisInventory
+  vars:
+    - attribute_name: AdminEmail
+    - attribute_value: ilorest@hpe.com
+    # - attribute_name: BootMode
+    # - attribute_value: LegacyBios
+    - dns_server: 0.0.0.0
+    - domain_name: tst.sgp.hp.mfg
+    - TimeZone: "Chennai"
+    - vlanID: 7
+    - new_user: bhavyatest1
+    - new_pass: testpass
+    - role_id: Administrator
+    - loginname: bhavyatest1
+    - new_pass: testpass123
+    - roleid: ReadOnly
+    - bootdevice: Pxe
+
+  roles:
+    #bios
+    - getBiosattr
+    - getBootorder
+    - getBootoverride
+    - changAttrname
+    - rebootsys
+    - setbiosdefault
+    # - setonetimeboot
+    #chassis
+    - getchassinven
+    - getchasspower
+    - getchassistherm
+    - getfaninven
+    - ledoff
+    - ledon
+    #inventory
+    - getcpuinven
+    - getDiskinven
+    - getfirminven
+    - getfirmupdate
+    - getmeminven
+    - getnicinven
+    - getpsuinven
+    - getsessions
+    - getSCinven
+    - getall
+    - systemdefault
+    - systeminven
+    - virtualmedia
+    - getvolumeinven
+    #manager
+    - clearlogs
+    - getlogs
+    - getmnicinven
+    # - setDNS
+    # - setVLANatrr
+    # - gracefulrestart
+    #power
+    - powerforceoff
+    - powerreboot
+    - powergracefullshutdown
+    - poweron
+    #user
+    - addiLOuseracc
+    - UpdatePass
+    - UpdateRole
+    - Deluser
+    - listAllusers

@@ -1,0 +1,10 @@
+---
+# tasks file for getmeminven
+- name: Get memory inventory
+  redfish_info:
+    category: Systems
+    command: GetMemoryInventory
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+  register: result_attr

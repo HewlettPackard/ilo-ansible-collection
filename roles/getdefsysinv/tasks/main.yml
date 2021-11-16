@@ -1,0 +1,9 @@
+---
+# tasks file for getdefsysinv
+- name: Get Inventory
+  redfish_info:
+    category: Systems
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+  register: result_attr

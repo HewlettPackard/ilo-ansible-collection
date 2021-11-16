@@ -1,0 +1,10 @@
+---
+# tasks file for getfirmupdate
+- name: Get Firmware Update Capabilities
+  redfish_info:
+    category: Update
+    command: GetFirmwareUpdateCapabilities
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+  register: result_attr

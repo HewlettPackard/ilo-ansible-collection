@@ -1,0 +1,12 @@
+---
+# tasks file for addiLOuseracc
+- name: Add user {{ new_user }}
+  ilo_redfish_command:
+    category: Accounts
+    command: AddiLOuser
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    new_username: "{{ new_user }}"
+    new_password: "{{ new_pass }}"
+    roleid: "{{ role_id }}"

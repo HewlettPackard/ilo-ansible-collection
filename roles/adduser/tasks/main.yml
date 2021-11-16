@@ -1,0 +1,12 @@
+---
+# tasks file for adduser
+- name: Add user
+  redfish_command:
+    category: Accounts
+    command: AddUser
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    new_username: "{{ new_user }}"
+    new_password: "{{ new_pass }}"
+    roleid: "{{ role_id }}"

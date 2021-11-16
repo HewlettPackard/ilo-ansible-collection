@@ -1,0 +1,9 @@
+---
+# tasks file for poweron
+- name: Turn system power on
+  redfish_command:
+    category: Systems
+    command: PowerOn
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"

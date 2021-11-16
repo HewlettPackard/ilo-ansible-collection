@@ -1,0 +1,10 @@
+---
+# tasks file for getallsysinven
+- name: Get all system Inventory
+  redfish_info:
+    category: Systems
+    command: all
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+  register: result_attr

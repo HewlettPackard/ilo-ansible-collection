@@ -1,0 +1,46 @@
+---
+- hosts: myhosts
+  connection: local
+  name: Get disk inventory
+  gather_facts: False
+  vars_files: iLO_redfish.yml
+
+  vars:
+    datatype: DiskInventory
+
+  tasks:
+    - name: Create session
+      redfish_command:
+        category: Sessions
+        command: CreateSession
+        baseuri: "{{ baseuri }}"
+        username: "{{ username }}"
+        password: "{{ password }}"
+      register: result
+
+    - name: Define output file
+      include_tasks: create_output_file.yml
+
+    #No storage  - https://15.146.51.202/redfish/v1/Systems/1/Storage/
+    - name: Get disk inventory
+      redfish_info:
+        category: Systems
+        command: GetDiskInventory
+        baseuri: "{{ baseuri }}"
+        # username: "{{ username }}"
+        # password: "{{ password }}"
+        auth_token: "{{ result.session.token }}"
+      register: result_storage
+
+    - name: Copy results to output file
+      copy:
+        content: "{{ result_storage | to_nice_json }}"
+        dest: "{{ template }}.json"
+
+    - name: Delete session using security token created by CreateSesssion above
+      redfish_command:
+        category: Sessions
+        command: DeleteSession
+        baseuri: "{{ baseuri }}"
+        auth_token: "{{ result.session.token }}"
+        session_uri: "{{ result.session.uri }}"

@@ -1,0 +1,6 @@
+---
+# tasks file for copyResulttoOp
+- name: Copy results to output file
+  copy:
+    content: "{{ result_attr | to_nice_json }}"
+    dest: "{{ template }}.json"

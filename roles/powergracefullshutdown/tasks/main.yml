@@ -1,0 +1,9 @@
+---
+# tasks file for powergracefullshutdown
+- name: Shutdown system power gracefully
+  redfish_command:
+    category: Systems
+    command: PowerGracefulShutdown
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"

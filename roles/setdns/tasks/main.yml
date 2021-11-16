@@ -1,0 +1,11 @@
+---
+# tasks file for setDNS
+- name: Set DNS Server to {{ dns_server }}
+  ilo_redfish_config:
+    category: Manager
+    command: SetDNSserver
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    attribute_name: DNSServers
+    attribute_value: "{{ dns_server }}"

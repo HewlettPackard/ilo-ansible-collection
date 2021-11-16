@@ -1,0 +1,44 @@
+---
+- hosts: myhosts
+  connection: local
+  name: Set default BIOS settings
+  gather_facts: False
+  # vars_files: iLO_redfish.yml
+
+  tasks:
+    - name: Create session
+      redfish_command:
+        category: Sessions
+        command: CreateSession
+        baseuri: "{{ baseuri }}"
+        username: "{{ username }}"
+        password: "{{ password }}"
+      register: result
+
+    - name: Set BIOS default settings
+      redfish_config:
+        category: Systems
+        command: SetBiosDefaultSettings
+        baseuri: "{{ baseuri }}"
+        # username: "{{ username }}"
+        # password: "{{ password }}"
+        auth_token: "{{ result.session.token }}"
+      register: bios_default
+
+    - name: Reboot system to apply new BIOS settings
+      redfish_command:
+        category: Systems
+        command: PowerReboot
+        baseuri: "{{ baseuri }}"
+        # username: "{{ username }}"
+        # password: "{{ password }}"
+        auth_token: "{{ result.session.token }}"
+      when: bios_default.changed
+
+    - name: Delete session using security token created by CreateSesssion above
+      redfish_command:
+        category: Sessions
+        command: DeleteSession
+        baseuri: "{{ baseuri }}"
+        auth_token: "{{ result.session.token }}"
+        session_uri: "{{ result.session.uri }}"

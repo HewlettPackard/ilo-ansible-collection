@@ -1,0 +1,9 @@
+---
+# tasks file for Logout
+- name: Delete session using security token created by CreateSesssion above
+  redfish_command:
+    category: Sessions
+    command: DeleteSession
+    baseuri: "{{ baseuri }}"
+    auth_token: "{{ result.session.token }}"
+    session_uri: "{{ result.session.uri }}"

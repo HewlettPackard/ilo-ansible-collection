@@ -1,0 +1,10 @@
+---
+# tasks file for getstgctrlinv
+- name: Get storage controller inventory
+  redfish_info:
+    category: Systems
+    command: GetStorageControllerInventory
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+  register: result_attr

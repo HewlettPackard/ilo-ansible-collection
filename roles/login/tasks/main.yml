@@ -1,0 +1,10 @@
+---
+# tasks file for Login
+- name: Create session
+  redfish_command:
+    category: Sessions
+    command: CreateSession
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+  register: result

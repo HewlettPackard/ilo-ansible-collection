@@ -1,0 +1,10 @@
+---
+# tasks file for getchassinven
+- name: Get chassis Inventory
+  redfish_info:
+    category: Chassis
+    command: GetChassisInventory
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+  register: result_attr

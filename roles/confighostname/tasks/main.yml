@@ -1,0 +1,11 @@
+---
+# tasks file for configHostName
+- name: Set {{ attribute_name }} to {{ attribute_value }}
+  ilo_redfish_config:
+    category: Manager
+    command: ConfigureHostName
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    attribute_name: "{{ attribute_name }}"
+    attribute_value: "{{ attribute_value }}"

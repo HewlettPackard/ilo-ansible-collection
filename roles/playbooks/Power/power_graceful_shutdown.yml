@@ -1,0 +1,33 @@
+---
+- hosts: myhosts
+  connection: local
+  name: Manage System Power - Graceful shutdown
+  gather_facts: False
+  # vars_files: iLO_redfish.yml
+
+  tasks:
+    - name: Create session
+      redfish_command:
+        category: Sessions
+        command: CreateSession
+        baseuri: "{{ baseuri }}"
+        username: "{{ username }}"
+        password: "{{ password }}"
+      register: result
+
+    - name: Shutdown system power gracefully
+      redfish_command:
+        category: Systems
+        command: PowerGracefulShutdown
+        baseuri: "{{ baseuri }}"
+        # username: "{{ username }}"
+        # password: "{{ password }}"
+        auth_token: "{{ result.session.token }}"
+
+    - name: Delete session using security token created by CreateSesssion above
+      redfish_command:
+        category: Sessions
+        command: DeleteSession
+        baseuri: "{{ baseuri }}"
+        auth_token: "{{ result.session.token }}"
+        session_uri: "{{ result.session.uri }}"

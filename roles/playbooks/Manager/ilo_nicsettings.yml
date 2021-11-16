@@ -1,0 +1,88 @@
+---
+- hosts: myhosts
+  connection: local
+  name: Set iLO NIC settings
+  gather_facts: False
+  # vars_files: iLO_redfish.yml
+
+  vars:
+    - dns_server: 192.168.1.1
+    - domain_name: tst.sgp.hp.mfg
+    - ntp_atrrname: StaticNTPServers
+    - ntp_attrvalue: 1.2.3.4
+    - WINS_attrname: WINSRegistration
+    - attribute_name: HostName
+    - attribute_value: ILOSGH924TZ38
+
+  tasks:
+    - name: Create session
+      redfish_command:
+        category: Sessions
+        command: CreateSession
+        baseuri: "{{ baseuri }}"
+        username: "{{ username }}"
+        password: "{{ password }}"
+      register: result
+
+    - name: Set {{ ntp_atrrname }} to {{ ntp_attrvalue }}
+      ilo_redfish_config:
+        category: Manager
+        command: SetNTPServers
+        baseuri: "{{ baseuri }}"
+        # username: "{{ username }}"
+        # password: "{{ password }}"
+        attribute_name: "{{ ntp_atrrname }}"
+        attribute_value: "{{ ntp_attrvalue }}"
+        auth_token: "{{ result.session.token }}"
+
+
+    - name: Set DNS Server to {{ dns_server }}
+      ilo_redfish_config:
+        category: Manager
+        command: SetDNSserver
+        baseuri: "{{ baseuri }}"
+        # username: "{{ username }}"
+        # password: "{{ password }}"
+        attribute_name: DNSServers
+        attribute_value: "{{ dns_server }}"
+        auth_token: "{{ result.session.token }}"
+
+    - name: Set Domain name to {{ domain_name }}
+      ilo_redfish_config:
+        category: Manager
+        command: SetDomainName
+        baseuri: "{{ baseuri }}"
+        # username: "{{ username }}"
+        # password: "{{ password }}"
+        attribute_name: DomainName
+        attribute_value: "{{ domain_name }}"
+        auth_token: "{{ result.session.token }}"
+
+    - name: Disable {{ WINS_attrname }}
+      ilo_redfish_config:
+        category: Manager
+        command: SetWINSReg
+        baseuri: "{{ baseuri }}"
+        # username: "{{ username }}"
+        # password: "{{ password }}"
+        attribute_name: "{{ WINS_attrname }}"
+        auth_token: "{{ result.session.token }}"
+
+    - name: Set {{ attribute_name }} to {{ attribute_value }}
+      redfish_config:
+        category: Manager
+        command: ConfigureHostName
+        baseuri: "{{ baseuri }}"
+        # username: "{{ username }}"
+        # password: "{{ password }}"
+        attribute_name: "{{ attribute_name }}"
+        attribute_value: "{{ attribute_value }}"
+        auth_token: "{{ result.session.token }}"
+
+    - name: Delete session using security token created by CreateSesssion above
+      redfish_command:
+        category: Sessions
+        command: DeleteSession
+        baseuri: "{{ baseuri }}"
+        auth_token: "{{ result.session.token }}"
+        session_uri: "{{ result.session.uri }}"

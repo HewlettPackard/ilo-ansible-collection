@@ -1,0 +1,10 @@
+---
+# tasks file for listAllusers
+- name: List all users
+  ilo_redfish_info:
+    category: Accounts
+    command: ListiLOUsers
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+  register: result_attr

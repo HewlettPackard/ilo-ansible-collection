@@ -1,0 +1,14 @@
+---
+# tasks file for changbiosattr
+- name: Set {{ bios_attr }}
+  redfish_config:
+    category: Systems
+    command: SetBiosAttributes
+    bios_attributes: "{{ bios_attr }}"
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+#     auth_token: "{{ result.session.token }}"
+  register: bios_attribute
+  notify:
+    - Reboot system to apply new BIOS settings

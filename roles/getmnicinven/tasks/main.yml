@@ -1,0 +1,10 @@
+---
+# tasks file for getmnicinven
+- name: Get Manager NIC inventory
+  redfish_info:
+    category: Manager
+    command: GetManagerNicInventory
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+  register: result_attr

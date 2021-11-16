@@ -1,0 +1,10 @@
+---
+# tasks file for getDiskinven
+- name: Get disk inventory
+  redfish_info:
+    category: Systems
+    command: GetDiskInventory
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+  register: result_attr

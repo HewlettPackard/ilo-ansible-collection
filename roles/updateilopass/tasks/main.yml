@@ -1,0 +1,11 @@
+---
+# tasks file for UpdatePass
+- name: Update user password
+  ilo_redfish_command:
+    category: Accounts
+    command: UpdateiLOpassword
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    loginname: "{{ loginname }}"
+    new_password: "{{ new_pass }}"

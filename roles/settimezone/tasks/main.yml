@@ -1,0 +1,11 @@
+---
+# tasks file for setTimeZone
+- name: Set TimeZone to {{ attribute_value }}
+  ilo_redfish_config:
+    category: Manager
+    command: SetTimeZone
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    attribute_name: TimeZone
+    attribute_value: "{{ attribute_value }}"

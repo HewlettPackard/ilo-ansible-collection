@@ -1,0 +1,10 @@
+---
+# tasks file for getchasspower
+- name: Get chassis power
+  redfish_info:
+    category: Chassis
+    command: GetChassisPower
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+  register: result_attr

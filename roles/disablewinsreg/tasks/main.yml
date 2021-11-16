@@ -1,0 +1,10 @@
+---
+# tasks file for disableWINSReg
+- name: Disable {{ attribute_name }}
+  ilo_redfish_config:
+    category: Manager
+    command: SetWINSReg
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    attribute_name: "{{ attribute_name }}"

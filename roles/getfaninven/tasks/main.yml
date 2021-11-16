@@ -1,0 +1,10 @@
+---
+# tasks file for getfaninven
+- name: Get fans statistics
+  redfish_info:
+    category: Chassis
+    command: GetFanInventory
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+  register: result_attr
