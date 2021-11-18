@@ -3,7 +3,7 @@
   connection: local
   name: Set one-time BIOS boot device
   gather_facts: False
-  vars_files: iLO_redfish.yml
+  # vars_files: iLO_redfish.yml
 
   # ONLY WORKS IN LEGACY BIOS MODE!
   #
