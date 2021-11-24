@@ -11,7 +11,7 @@ CMD ["echo","Container created"]
 
 #For configuring the hosts file
 RUN echo [hpe] >>[] /etc/ansible/hosts
-RUN echo hpe1    baseuri=15.146.46.124 >> /etc/ansible/hosts
+RUN echo hpe1    baseuri=10.16.40.12 >> /etc/ansible/hosts
 RUN echo [myhosts:children] >> /etc/ansible/hosts
 RUN echo hpe >> /etc/ansible/hosts
 RUN echo [myhosts:vars] >> /etc/ansible/hosts
