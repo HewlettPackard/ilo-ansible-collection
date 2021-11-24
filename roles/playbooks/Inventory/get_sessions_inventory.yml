@@ -22,7 +22,7 @@
       include_tasks: create_output_file.yml
 
     - name: Get sessions
-      ilo_redfish_config:
+      ilo_redfish_info:
         category: Sessions
         command: GetiLOSessions
         baseuri: "{{ baseuri }}"

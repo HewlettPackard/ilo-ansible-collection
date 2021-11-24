@@ -1,63 +1,76 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-
-# Copyright (c) 2021-2022 Hewlett Packard Enterprise, Inc. All rights reserved.
-# GNU General Public License v3.0+ (see LICENSE or https://www.gnu.org/licenses/gpl-3.0.txt)
-
+###
+# Copyright (2021) Hewlett Packard Enterprise Development LP
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# You may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+###
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 DOCUMENTATION = '''
 ---
 module: ilo_redfish_config
-short_description: Sets or updates a configuration attribute. For use with HPE iLO operations that require Redfish OEM extensions.
+short_description: Sets or updates configuration attributes on HPE iLO with Redfish OEM extensions
 version_added: 4.1.0
 description:
-    - "Provides an interface to manage configuration attributes."
+    - Builds Redfish URIs locally and sends them to remote OOB controllers to
+    set or update a configuration attribute.
+    - For use with HPE iLO operations that require Redfish OEM extensions
 options:
   category:
     required: true
     type: str
     description:
-      - Command category to execute on iLO
-    choices: ['Manager', 'Sessions']
+      - Command category to execute on iLO.
+    choices: ['Manager']
   command:
     required: true
     description:
-      - List of commands to execute on iLO
+      - List of commands to execute on iLO.
     type: list
     elements: str
   baseuri:
     required: true
     description:
-      - Base URI of iLO
+      - Base URI of iLO.
     type: str
   username:
     description:
-      - User for authentication with iLO
+      - User for authentication with iLO.
     type: str
   password:
     description:
-      - Password for authentication with iLO
+      - Password for authentication with iLO.
     type: str
   auth_token:
     description:
-      - Security token for authentication with OOB controller
+      - Security token for authentication with OOB controller.
     type: str
   timeout:
     description:
-      - Timeout in seconds for URL requests to iLO controller
+      - Timeout in seconds for URL requests to iLO controller.
     default: 10
     type: int
   attribute_name:
-    required: false
+    required: true
     description:
-      - Name of the attribute
+      - Name of the attribute.
     type: str
   attribute_value:
     required: false
     description:
-      - Value of the attribute
+      - Value of the attribute.
     type: str
 requirements:
     - "python >= 3.8"
@@ -88,8 +101,7 @@ EXAMPLES = '''
 '''
 
 CATEGORY_COMMANDS_ALL = {
-    "Manager": ["SetTimeZone", "SetDNSserver", "SetDomainName", "SetNTPServers", "SetWINSReg"],
-    "Sessions": ["GetiLOSessions"]
+    "Manager": ["SetTimeZone", "SetDNSserver", "SetDomainName", "SetNTPServers", "SetWINSReg"]
 }
 
 from ansible_collections.community.general.plugins.module_utils.ilo_redfish_utils import iLORedfishUtils
@@ -107,18 +119,26 @@ def main():
             baseuri=dict(required=True),
             username=dict(),
             password=dict(no_log=True),
-            attribute_name=dict(),
-            attribute_value=dict(),
             auth_token=dict(no_log=True),
+            attribute_name=dict(required=True),
+            attribute_value=dict(),
             timeout=dict(type='int', default=10)
         ),
+        required_together=[
+            ('username', 'password'),
+        ],
+        required_one_of=[
+            ('username', 'auth_token'),
+        ],
+        mutually_exclusive=[
+            ('username', 'auth_token'),
+        ],
         supports_check_mode=False
     )
 
     category = module.params['category']
     command_list = module.params['command']
 
-    session_id = None
     creds = {"user": module.params['username'],
              "pswd": module.params['password'],
              "token": module.params['auth_token']}
@@ -138,9 +158,9 @@ def main():
             offending, CATEGORY_COMMANDS_ALL[category])))
 
     if category == "Manager":
-        result = rf_utils._find_managers_resource()
-        if not result['ret']:
-            module.fail_json(msg=to_native(result['msg']))
+        resource = rf_utils._find_managers_resource()
+        if not resource['ret']:
+            module.fail_json(msg=to_native(resource['msg']))
 
         dispatch = dict(
             SetTimeZone=rf_utils.set_time_zone,
@@ -152,11 +172,6 @@ def main():
 
         for command in command_list:
             result = dispatch[command](mgr_attributes)
-
-    elif category == "Sessions":
-        for command in command_list:
-            if command == "GetiLOSessions":
-                result = rf_utils.get_ilo_sessions()
 
     if result['ret']:
         module.exit_json(changed=result.get('changed'),

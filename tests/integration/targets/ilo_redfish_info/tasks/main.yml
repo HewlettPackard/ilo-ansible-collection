@@ -1,5 +1,3 @@
----
-# tasks file for getsessions
 - name: Get sessions
   ilo_redfish_info:
     category: Sessions
@@ -7,4 +5,4 @@
     baseuri: "{{ baseuri }}"
     username: "{{ username }}"
     password: "{{ password }}"
-  register: result_attr
+  register: result_sessions
