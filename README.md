@@ -12,6 +12,7 @@ Example playbooks and roles use the following collection and modules:
     - [redfish_command](https://docs.ansible.com/ansible/latest/collections/community/general/redfish_command_module.html)
     - [redfish_config](https://docs.ansible.com/ansible/latest/collections/community/general/redfish_config_module.html)
     - [ilo_redfish_config](https://docs.ansible.com/ansible/latest/collections/community/general/ilo_redfish_config_module.html)
+    - [ilo_redfish_info](https://docs.ansible.com/ansible/latest/collections/community/general/ilo_redfish_info_module.html)
 
 ## Requirements
 
