@@ -68,15 +68,15 @@
         attribute_name: "{{ WINS_attrname }}"
         auth_token: "{{ result.session.token }}"
 
-    - name: Set {{ attribute_name }} to {{ attribute_value }}
+    - name: Set HostName
       redfish_config:
         category: Manager
-        command: ConfigureHostName
+        command: SetManagerNic
+        nic_config:
+          HostName: "{{ attribute_value }}"
         baseuri: "{{ baseuri }}"
         # username: "{{ username }}"
         # password: "{{ password }}"
-        attribute_name: "{{ attribute_name }}"
-        attribute_value: "{{ attribute_value }}"
         auth_token: "{{ result.session.token }}"
 
     - name: Delete session using security token created by CreateSesssion above

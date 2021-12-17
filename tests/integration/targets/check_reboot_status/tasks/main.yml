@@ -1,0 +1,10 @@
+- name: Checking server reboot status
+  check_reboot_status:
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+  register: result
+
+- name: Server reboot status
+  debug:
+    msg: "{{ result }}"

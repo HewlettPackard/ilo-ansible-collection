@@ -1,0 +1,12 @@
+---
+- name: Verify service BIOS attributes
+  verify_service_bios_attributes:
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    service_attributes: "{{ service_attributes }}"
+  register: result
+
+- name: Status
+  debug:
+    msg: "{{ result }}"

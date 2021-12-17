@@ -1,0 +1,12 @@
+---
+- name: Verify input Boot Order against the server boot order
+  verify_uefi_boot_order:
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    uefi_boot_order: "{{ uefi_boot_order }}"
+  register: boot_verification_status
+
+- name: BootOrder verification status
+  debug:
+    msg: "{{ boot_verification_status }}"

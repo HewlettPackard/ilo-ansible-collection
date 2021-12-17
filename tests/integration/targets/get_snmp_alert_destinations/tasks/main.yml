@@ -1,0 +1,10 @@
+- name: Get SNMP alert destinations
+  get_snmp_alert_destinations:
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+  register: result
+
+- name: SNMP alert destinations in the server
+  debug:
+    msg: "{{ result }}"

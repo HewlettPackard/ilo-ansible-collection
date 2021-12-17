@@ -1,0 +1,16 @@
+---
+- hosts: myhosts
+  connection: local
+  gather_facts: False
+  tasks:
+  - name: Creating SNMPv3 users
+    create_snmpv3_users:
+      baseuri: "{{ baseuri }}"
+      username: "{{ username }}"
+      password: "{{ password }}"
+      snmpv3_users: "{{ snmpv3_users }}"
+    register: result
+
+  - name: Status
+    debug:
+      msg: "{{ result }}"

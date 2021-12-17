@@ -1,0 +1,29 @@
+---
+- hosts: myhosts
+  connection: local
+  gather_facts: False
+  tasks:
+    - name: Get logical drives details
+      get_logical_drives_details:
+        baseuri: "{{ baseuri }}"
+        username: "{{ username }}"
+        password: "{{ password }}"
+      register: logical_drives_data
+
+    - name: Check if logical drives exists in the server
+      debug:
+        msg: "No logical drives present in the server"
+      when: logical_drives_data['logical_drives_details'] | length | int == 0
+
+    - name: Delete all logical drives
+      delete_all_logical_drives:
+        baseuri: "{{ baseuri }}"
+        username: "{{ username }}"
+        password: "{{ password }}"
+      register: result
+      when: logical_drives_data['logical_drives_details'] | length | int > 0
+
+    - name: Status
+      debug:
+        msg: "{{ result }}"
+      when: logical_drives_data['logical_drives_details'] | length | int > 0

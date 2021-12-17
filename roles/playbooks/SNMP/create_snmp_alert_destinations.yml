@@ -1,0 +1,16 @@
+---
+- hosts: myhosts
+  connection: local
+  gather_facts: False
+  tasks:
+  - name: Creating SNMP alert destinations
+    create_snmp_alert_destinations:
+      baseuri: "{{ baseuri }}"
+      username: "{{ username }}"
+      password: "{{ password }}"
+      alert_destinations: "{{ alert_destinations }}"
+    register: result
+
+  - name: Status
+    debug:
+      msg: "{{ result }}"

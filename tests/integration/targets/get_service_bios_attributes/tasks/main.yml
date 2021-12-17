@@ -1,0 +1,10 @@
+- name: Get service BIOS attributes
+  get_service_bios_attributes:
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+  register: result
+
+- name: Service BIOS settings in the server
+  debug:
+    msg: "{{ result }}"

@@ -1,0 +1,12 @@
+- name: Set service BIOS attributes
+  set_service_bios_attributes:
+    service_attributes: "{{ service_attributes }}"
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+  register: result
+
+- name: Status
+  debug:
+    msg: "{{ result }}"
+

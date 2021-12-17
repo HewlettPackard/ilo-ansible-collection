@@ -1,0 +1,16 @@
+---
+- hosts: myhosts
+  connection: local
+  gather_facts: False
+  tasks:
+    - name: Create logical drives
+      create_logical_drives:
+        baseuri: "{{ baseuri }}"
+        username: "{{ username }}"
+        password: "{{ password }}"
+        raid_details: "{{ raid_details }}"
+      register: result
+
+    - name: Status
+      debug:
+        msg: "{{ result }}"

@@ -1,0 +1,11 @@
+- name: verify logical drives
+  verify_logical_drives:
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    raid_details: "{{ raid_details }}"
+  register: result
+
+- name: Logical drives verification status
+  debug:
+    msg: "{{ result }}"

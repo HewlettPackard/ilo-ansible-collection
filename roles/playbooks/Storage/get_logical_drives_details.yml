@@ -1,0 +1,20 @@
+---
+- hosts: myhosts
+  connection: local
+  gather_facts: False
+  tasks:
+    - name: Get logical drives details
+      get_logical_drives_details:
+        baseuri: "{{ baseuri }}"
+        username: "{{ username }}"
+        password: "{{ password }}"
+      register: logical_drives_data
+
+    - name: Logical drives present in the server
+      debug:
+        msg: "{{ logical_drives_data }}"
+
+    - set_stats:
+        data:
+          logical_drives_count: "{{ logical_drives_data['logical_drives_details'] | length }}"
+          logical_drives_details: "{{ logical_drives_data['logical_drives_details'] }}"

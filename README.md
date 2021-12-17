@@ -3,7 +3,7 @@
 This repository contains the Ansible playbook samples and Ansible roles for automating the HPE server lifecycle management using iLOs.
 The examples highlight the capabilities of the modules and their ability to be integrated into more complex playbooks, workflows, and applications.
 
-These [roles](roles) and [playbooks](roles/playbooks) should give you a very good idea of how to create your own playbooks for your own needs.
+These [roles](https://github.com/HewlettPackard/ilo-ansible-collection/tree/main/roles) and [playbooks](https://github.com/HewlettPackard/ilo-ansible-collection/tree/main/roles/playbooks) should give you a very good idea of how to create your own playbooks for your own needs.
 
 Example playbooks and roles use the following collection and modules:
 

@@ -1,32 +1,20 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-###
-# Copyright (2021) Hewlett Packard Enterprise Development LP
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# You may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-# http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-###
+# Copyright (c) 2021-2022 Hewlett Packard Enterprise, Inc. All rights reserved.
+# GNU General Public License v3.0+ (see LICENSE or https://www.gnu.org/licenses/gpl-3.0.txt)
 from __future__ import absolute_import, division, print_function
+
 __metaclass__ = type
 
-DOCUMENTATION = '''
+DOCUMENTATION = """
 ---
 module: ilo_redfish_config
 short_description: Sets or updates configuration attributes on HPE iLO with Redfish OEM extensions
-version_added: 4.1.0
+version_added: 4.2.0
 description:
-    - Builds Redfish URIs locally and sends them to remote OOB controllers to
+  - Builds Redfish URIs locally and sends them to iLO to
     set or update a configuration attribute.
-    - For use with HPE iLO operations that require Redfish OEM extensions
+  - For use with HPE iLO operations that require Redfish OEM extensions.
 options:
   category:
     required: true
@@ -65,21 +53,18 @@ options:
   attribute_name:
     required: true
     description:
-      - Name of the attribute.
+      - Name of the attribute to be configured.
     type: str
   attribute_value:
     required: false
     description:
-      - Value of the attribute.
+      - Value of the attribute to be configured.
     type: str
-requirements:
-    - "python >= 3.8"
-    - "ansible >= 3.2"
 author:
     - "Bhavya B (@bhavya06)"
-'''
+"""
 
-EXAMPLES = '''
+EXAMPLES = """
   - name: Disable WINS Registration
     community.general.ilo_redfish_config:
       category: Manager
@@ -98,13 +83,29 @@ EXAMPLES = '''
       password: Testpass123
       attribute_name: TimeZone
       attribute_value: Chennai
-'''
+"""
+
+RETURN = """
+msg:
+    description: Message with action result or error description
+    returned: always
+    type: str
+    sample: "Action was successful"
+"""
 
 CATEGORY_COMMANDS_ALL = {
-    "Manager": ["SetTimeZone", "SetDNSserver", "SetDomainName", "SetNTPServers", "SetWINSReg"]
+    "Manager": [
+        "SetTimeZone",
+        "SetDNSserver",
+        "SetDomainName",
+        "SetNTPServers",
+        "SetWINSReg",
+    ]
 }
 
-from ansible_collections.community.general.plugins.module_utils.ilo_redfish_utils import iLORedfishUtils
+from ansible_collections.community.general.plugins.module_utils.ilo_redfish_utils import (
+    iLORedfishUtils,
+)
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils._text import to_native
 
@@ -113,72 +114,79 @@ def main():
     result = {}
     module = AnsibleModule(
         argument_spec=dict(
-            category=dict(required=True, choices=list(
-                CATEGORY_COMMANDS_ALL.keys())),
-            command=dict(required=True, type='list', elements='str'),
+            category=dict(required=True, choices=list(CATEGORY_COMMANDS_ALL.keys())),
+            command=dict(required=True, type="list", elements="str"),
             baseuri=dict(required=True),
             username=dict(),
             password=dict(no_log=True),
             auth_token=dict(no_log=True),
             attribute_name=dict(required=True),
             attribute_value=dict(),
-            timeout=dict(type='int', default=10)
+            timeout=dict(type="int", default=10),
         ),
         required_together=[
-            ('username', 'password'),
+            ("username", "password"),
         ],
         required_one_of=[
-            ('username', 'auth_token'),
+            ("username", "auth_token"),
         ],
         mutually_exclusive=[
-            ('username', 'auth_token'),
+            ("username", "auth_token"),
         ],
-        supports_check_mode=False
+        supports_check_mode=False,
     )
 
-    category = module.params['category']
-    command_list = module.params['command']
+    category = module.params["category"]
+    command_list = module.params["command"]
 
-    creds = {"user": module.params['username'],
-             "pswd": module.params['password'],
-             "token": module.params['auth_token']}
+    creds = {
+        "user": module.params["username"],
+        "pswd": module.params["password"],
+        "token": module.params["auth_token"],
+    }
 
-    timeout = module.params['timeout']
+    timeout = module.params["timeout"]
 
-    root_uri = "https://" + module.params['baseuri']
+    root_uri = "https://" + module.params["baseuri"]
     rf_utils = iLORedfishUtils(creds, root_uri, timeout, module)
-    mgr_attributes = {'mgr_attr_name': module.params['attribute_name'],
-                      'mgr_attr_value': module.params['attribute_value']}
+    mgr_attributes = {
+        "mgr_attr_name": module.params["attribute_name"],
+        "mgr_attr_value": module.params["attribute_value"],
+    }
+    changed = False
 
     offending = [
-        cmd for cmd in command_list if cmd not in CATEGORY_COMMANDS_ALL[category]]
+        cmd for cmd in command_list if cmd not in CATEGORY_COMMANDS_ALL[category]
+    ]
 
     if offending:
-        module.fail_json(msg=to_native("Invalid Command(s): '%s'. Allowed Commands = %s" % (
-            offending, CATEGORY_COMMANDS_ALL[category])))
+        module.fail_json(
+            msg=to_native(
+                "Invalid Command(s): '%s'. Allowed Commands = %s"
+                % (offending, CATEGORY_COMMANDS_ALL[category])
+            )
+        )
 
     if category == "Manager":
         resource = rf_utils._find_managers_resource()
-        if not resource['ret']:
-            module.fail_json(msg=to_native(resource['msg']))
+        if not resource["ret"]:
+            module.fail_json(msg=to_native(resource["msg"]))
 
         dispatch = dict(
             SetTimeZone=rf_utils.set_time_zone,
             SetDNSserver=rf_utils.set_dns_server,
             SetDomainName=rf_utils.set_domain_name,
             SetNTPServers=rf_utils.set_ntp_server,
-            SetWINSReg=rf_utils.set_wins_registration
+            SetWINSReg=rf_utils.set_wins_registration,
         )
 
         for command in command_list:
-            result = dispatch[command](mgr_attributes)
+            result[command] = dispatch[command](mgr_attributes)
+            if "changed" in result[command]:
+                changed |= result[command]["changed"]
 
-    if result['ret']:
-        module.exit_json(changed=result.get('changed'),
-                         msg=to_native(result.get('msg')))
-    else:
-        module.fail_json(msg=to_native(result['msg']))
+    module.exit_json(ilo_redfish_config=result, changed=changed)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
