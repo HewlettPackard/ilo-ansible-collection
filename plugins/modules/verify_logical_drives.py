@@ -67,7 +67,7 @@ EXAMPLES = r"""
     baseuri: "***.***.***.***"
     username: "abcxyz"
     password: "******"
-    raid_details: "[{"LogicalDriveName": "LD1",
+    raid_details: [{"LogicalDriveName": "LD1",
                      "Raid": "Raid1",
                      "DataDrives": {
                         "DataDriveCount": 2,
@@ -75,7 +75,7 @@ EXAMPLES = r"""
                         "DataDriveInterfaceType": "SAS",
                         "DataDriveMinimumSizeGiB": 0
                         }
-                    }]"
+                    }]
 
 """
 
@@ -126,27 +126,32 @@ RETURN = r"""
     type: str
   failure case 9:
     description: Getting list of logical drives failed
-    returned: GET on /redfish/v1/Systems/1/SmartStorage/ArrayControllers/<controller_ID>/LogicalDrives/ Failed, Status <status code>, Response <API response>
+    returned: GET on /redfish/v1/Systems/1/SmartStorage/ArrayControllers/<controller_ID>/LogicalDrives/ Failed, Status <status code>,
+     Response <API response>
     corrective_action: Verify the response in the output message
     type: str
   failure case 10:
     description: Getting specific logical drive details failed
-    returned: GET on /redfish/v1/Systems/1/SmartStorage/ArrayControllers/<controller_ID>/LogicalDrives/<LogicalDrive_ID>/ Failed, Status <status code>, Response <API response>
+    returned: GET on /redfish/v1/Systems/1/SmartStorage/ArrayControllers/<controller_ID>/LogicalDrives/<LogicalDrive_ID>/ Failed, Status <status code>,
+     Response <API response>
     corrective_action: Verify the response in the output message
     type: str
   failure case 11:
     description: Getting physical drive URI attached to logical drive failed
-    returned: Physical Drives information not found in /redfish/v1/Systems/1/SmartStorage/ArrayControllers/<controller_ID>/LogicalDrives/<LogicalDrive_ID>/ response
+    returned: Physical Drives information not found in /redfish/v1/Systems/1/SmartStorage/ArrayControllers/<controller_ID>/LogicalDrives/<LogicalDrive_ID>/
+     response
     corrective_action: Validate the physical drive details from server
     type: str
   failure case 12:
     description: Getting list of physical drives attached to logical drive failed
-    returned: GET on /redfish/v1/Systems/1/SmartStorage/ArrayControllers/<controller_ID>/LogicalDrives/<LogicalDrive_ID>/DataDrives/ Failed, Status <status code>, Response <API response>
+    returned: GET on /redfish/v1/Systems/1/SmartStorage/ArrayControllers/<controller_ID>/LogicalDrives/<LogicalDrive_ID>/DataDrives/ Failed,
+     Status <status code>, Response <API response>
     corrective_action: Verify the response in the output message
     type: str
   failure case 13:
     description: Getting specific physical drive details failed
-    returned: GET on /redfish/v1/Systems/1/SmartStorage/ArrayControllers/<controller_ID>/DiskDrives/<Disk_ID>/ Failed, Status <status code>, Response <API response>
+    returned: GET on /redfish/v1/Systems/1/SmartStorage/ArrayControllers/<controller_ID>/DiskDrives/<Disk_ID>/ Failed, Status <status code>,
+     Response <API response>
     corrective_action: Verify the response in the output message
     type: str
   failure case 14:
@@ -389,7 +394,7 @@ def main():
 
     # Create a Redfish client object
     http_schema = module.params["http_schema"]
-    base_url = "{}://{}".format(http_schema, module.params["baseuri"])
+    base_url = "{0}://{1}".format(http_schema, module.params["baseuri"])
     redfishClient = redfish_client(
         base_url=base_url,
         username=module.params["username"],

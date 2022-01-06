@@ -134,12 +134,14 @@ RETURN = r"""
     type: str
   failure case 6:
     description: Getting particular SNMP alert destination failed
-    returned: GET on /redfish/v1/Managers/1/SnmpService/SNMPAlertDestinations/<alert_destination ID>/ Failed, Status <Status code>, Response <API response>
+    returned: GET on /redfish/v1/Managers/1/SnmpService/SNMPAlertDestinations/<alert_destination ID>/ Failed, Status <Status code>,
+     Response <API response>
     corrective_action: Verify the response in the output message
     type: str
   failure case 7:
     description: Maximum alert destinations in the server reached
-    returned: Maximum of 8 alert destinations can be added to a server. Already server has <number of existing alert destinations in server> Alertdestinations and provided <number of alert destinations provided as input> more Alertdestinations
+    returned: Maximum of 8 alert destinations can be added to a server. Already server has <number of existing alert destinations in server>
+     Alertdestinations and provided <number of alert destinations provided as input> more Alertdestinations
     corrective_action: Validate the input to provide the correct number of SNMP alert destinations
     type: str
   failure case 8:
@@ -242,7 +244,7 @@ def validate_alert_destinations(server_alert_destinations, alert_destinations, m
                 )
         try:
             ipaddress.ip_address(dest["destination_ip"])
-        except:
+        except Exception as e:
             module.fail_json(msg="Invalid IP address: %s" % dest["destination_ip"])
         if dest["snmp_alert_protocol"].lower() == "snmpv1trap":
             dest["snmp_alert_protocol"] = "SNMPv1Trap"
@@ -310,7 +312,7 @@ def main():
     alert_destinations = module.params["alert_destinations"]
     http_schema = module.params["http_schema"]
 
-    base_url = "{}://{}".format(http_schema, baseuri)
+    base_url = "{0}://{1}".format(http_schema, baseuri)
     redfishClient = redfish_client(
         base_url=base_url, username=username, password=password
     )

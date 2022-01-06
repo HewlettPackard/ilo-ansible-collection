@@ -135,7 +135,7 @@ def main():
 
     # Create a Redfish client object
     http_schema = module.params["http_schema"]
-    base_url = "{}://{}".format(http_schema, module.params["baseuri"])
+    base_url = "{0}://{1}".format(http_schema, module.params["baseuri"])
     redfishClient = redfish_client(
         base_url=base_url,
         username=module.params["username"],

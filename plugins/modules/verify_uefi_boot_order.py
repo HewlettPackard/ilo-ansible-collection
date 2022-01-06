@@ -97,7 +97,8 @@ RETURN = r"""
     type: str
   failure case 5:
     description: Getting Boot settings failed
-    returned: GET on /redfish/v1/Systems/1/bios/boot/settings/ Failed, Status <Status code>, Response <API response> (or) GET on /redfish/v1/Systems/1/bios/oem/hpe/boot/settings/ Failed, Status <Status code>, Response <API response>
+    returned: GET on /redfish/v1/Systems/1/bios/boot/settings/ Failed, Status <Status code>, Response <API response> (or)
+     GET on /redfish/v1/Systems/1/bios/oem/hpe/boot/settings/ Failed, Status <Status code>, Response <API response>
     corrective_action: Verify the response in the output message
     type: str
   failure case 6:
@@ -110,22 +111,22 @@ RETURN = r"""
     returned: Lesser number of elements in serverBootOrder (<no. of elements in server bootorder>) than InputBootOrder (<no. of elements in input bootorder)
     corrective_action: No action needed, expected failure
     type: str
-  failure case 7:
+  failure case 8:
     description: Getting the boot order when BootMode is not UEFI
     returned: Server BootMode is not UEFI. Hence BootOrder can't be verified
     corrective_action: No action needed, expected failure
     type: str
-  failure case 8:
+  failure case 9:
     description: Input BootOrder doesn't match with Server BootOrder
     returned: Input BootOrder <input boot order> doesn't match with Server BootOrder <server boot order>
     corrective_action: No action needed, expected failure
     type: str
-  failure case 9:
+  failure case 10:
     description: Incorrect/Unreachable server IP address(baseuri) is provided
     returned: RetriesExhaustedError
     corrective_action: Provide the correct IP address of the server
     type: str
-  failure case 10:
+  failure case 11:
     description: Redfish Package is not installed
     returned: Failed to import the required Python library (redfish)
     corrective_action: Install python3-redfish package
@@ -279,7 +280,7 @@ def main():
         module.fail_json(msg=missing_required_lib("redfish"))
 
     http_schema = module.params["http_schema"]
-    base_url = "{}://{}".format(http_schema, module.params["baseuri"])
+    base_url = "{0}://{1}".format(http_schema, module.params["baseuri"])
     redfishClient = redfish_client(
         base_url=base_url,
         username=module.params["username"],

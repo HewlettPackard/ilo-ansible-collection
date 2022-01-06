@@ -90,7 +90,8 @@ RETURN = r"""
     type: str
   failure case 5:
     description: Getting Boot settings failed
-    returned: GET on /redfish/v1/Systems/1/bios/boot/settings/ Failed, Status <Status code>, Response <API response> (or) GET on /redfish/v1/Systems/1/bios/oem/hpe/boot/settings/ Failed, Status <Status code>, Response <API response>
+    returned: GET on /redfish/v1/Systems/1/bios/boot/settings/ Failed, Status <Status code>, Response <API response> (or)
+     GET on /redfish/v1/Systems/1/bios/oem/hpe/boot/settings/ Failed, Status <Status code>, Response <API response>
     corrective_action: Verify the response in the output message
     type: str
   failure case 6:
@@ -188,7 +189,7 @@ if __name__ == "__main__":
         module.fail_json(msg=missing_required_lib("redfish"))
 
     http_schema = module.params["http_schema"]
-    base_url = "{}://{}".format(http_schema, module.params["baseuri"])
+    base_url = "{0}://{1}".format(http_schema, module.params["baseuri"])
     redfishClient = redfish_client(
         base_url=base_url,
         username=module.params["username"],

@@ -149,7 +149,8 @@ RETURN = r"""
     type: str
   failure case 7:
     description: Maximum snmpv3 users in the server reached
-    returned: Maximum of 8 SNMPv3 users can be added to a server. Already server has <number of existing users in server> users and provided <number of users provided as input> more users
+    returned: Maximum of 8 SNMPv3 users can be added to a server. Already server has <number of existing users in server> users and provided
+     <number of users provided as input> more users
     corrective_action: Expected output if maximum limit of snmpv3 users reached. Validate the input to provide the correct number of snmpv3 users
     type: str
   failure case 8:
@@ -169,7 +170,8 @@ RETURN = r"""
     type: str
   failure case 11:
     description: User exists with same name and different protocols
-    returned: Already user exists with same name <security name> and protocols <auth_protocol and privacy_protocol>, so user cannot be created with different protocols
+    returned: Already user exists with same name <security name> and protocols <auth_protocol and privacy_protocol>, so user cannot be
+     created with different protocols
     corrective_action: Modify the security name or delete the existing user
     type: str
   failure case 12:
@@ -395,7 +397,7 @@ def main():
     snmpv3_users = module.params["snmpv3_users"]
     http_schema = module.params["http_schema"]
 
-    base_url = "{}://{}".format(http_schema, baseuri)
+    base_url = "{0}://{1}".format(http_schema, baseuri)
     redfishClient = redfish_client(
         base_url=base_url, username=username, password=password
     )

@@ -198,7 +198,7 @@ def main():
     password = module.params["password"]
     http_schema = module.params["http_schema"]
 
-    base_url = "{}://{}".format(http_schema, baseuri)
+    base_url = "{0}://{1}".format(http_schema, baseuri)
     redfishClient = redfish_client(
         base_url=base_url, username=username, password=password
     )

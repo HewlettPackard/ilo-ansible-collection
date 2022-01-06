@@ -178,22 +178,26 @@ RETURN = r"""
     type: str
   failure case 10:
     description: Getting specific logical drive details failed
-    returned: GET on /redfish/v1/Systems/1/SmartStorage/ArrayControllers/<controller_ID>/LogicalDrives/<LogicalDrive_ID>/ Failed, Status <status code>, Response <API response>
+    returned: GET on /redfish/v1/Systems/1/SmartStorage/ArrayControllers/<controller_ID>/LogicalDrives/<LogicalDrive_ID>/ Failed, Status <status code>,
+     Response <API response>
     corrective_action: Verify the response in the output message
     type: str
   failure case 11:
     description: Getting physical drive URI attached to logical drive failed
-    returned: Physical Drives information not found in /redfish/v1/Systems/1/SmartStorage/ArrayControllers/<controller_ID>/LogicalDrives/<LogicalDrive_ID>/ response
+    returned: Physical Drives information not found in /redfish/v1/Systems/1/SmartStorage/ArrayControllers/<controller_ID>/LogicalDrives/<LogicalDrive_ID>/
+     response
     corrective_action: Validate the physical drive details from server
     type: str
   failure case 12:
     description: Getting list of physical drives attached to logical drive failed
-    returned: GET on /redfish/v1/Systems/1/SmartStorage/ArrayControllers/<controller_ID>/LogicalDrives/<LogicalDrive_ID>/DataDrives/ Failed, Status <status code>, Response <API response>
+    returned: GET on /redfish/v1/Systems/1/SmartStorage/ArrayControllers/<controller_ID>/LogicalDrives/<LogicalDrive_ID>/DataDrives/ Failed,
+     Status <status code>, Response <API response>
     corrective_action: Verify the response in the output message
     type: str
   failure case 13:
     description: Getting specific physical drive details failed
-    returned: GET on /redfish/v1/Systems/1/SmartStorage/ArrayControllers/<controller_ID>/DiskDrives/<Disk_ID>/ Failed, Status <status code>, Response <API response>
+    returned: GET on /redfish/v1/Systems/1/SmartStorage/ArrayControllers/<controller_ID>/DiskDrives/<Disk_ID>/ Failed, Status <status code>,
+     Response <API response>
     corrective_action: Verify the response in the output message
     type: str
   failure case 14:
@@ -223,7 +227,8 @@ RETURN = r"""
     type: str
   failure case 19:
     description: Input parameter is missing
-    returned: Input parameters <missing parameter> are missing to create logical drive. Mandatory parameters are ['LogicalDriveName', 'Raid', 'DataDrives'] and in data drive details ['DataDriveCount','DataDriveMediaType','DataDriveInterfaceType','DataDriveMinimumSizeGiB']
+    returned: Input parameters <missing parameter> are missing to create logical drive. Mandatory parameters are ['LogicalDriveName', 'Raid', 'DataDrives']
+     and in data drive details ['DataDriveCount','DataDriveMediaType','DataDriveInterfaceType','DataDriveMinimumSizeGiB']
     corrective_action: Provide all the input parameters
     type: str
   failure case 20:
@@ -248,17 +253,20 @@ RETURN = r"""
     type: str
   failure case 24:
     description: Getting a list of unconfigured physical drives failed
-    returned: GET on /redfish/v1/Systems/1/SmartStorage/ArrayControllers/<controller_ID>/UnconfiguredDrives/ Failed, Status <Status code>, Response <API response>
+    returned: GET on /redfish/v1/Systems/1/SmartStorage/ArrayControllers/<controller_ID>/UnconfiguredDrives/ Failed, Status <Status code>,
+     Response <API response>
     corrective_action: Verify the response in the output message
     type: str
   failure case 25:
     description: Getting specific unconfigured physical drive details failed
-    returned: GET on /redfish/v1/Systems/1/SmartStorage/ArrayControllers/<controller_ID>/DiskDrives/<physical_drive_ID>/ Failed, Status <Status code>, Response <API response>
+    returned: GET on /redfish/v1/Systems/1/SmartStorage/ArrayControllers/<controller_ID>/DiskDrives/<physical_drive_ID>/ Failed,
+     Status <Status code>, Response <API response>
     corrective_action: Verify the response in the output message
     type: str
   failure case 26:
     description: Free physical drive not found with required specification
-    returned: Free physical drive not found with media type <media type>, interface type <interface type>, and capacity <minimum size required in physical drive>
+    returned: Free physical drive not found with media type <media type>, interface type <interface type>, and
+     capacity <minimum size required in physical drive>
     corrective_action: Verify the physical drives available in the server
     type: str
 """
@@ -636,7 +644,7 @@ def main():
 
     # Create a Redfish client object
     http_schema = module.params["http_schema"]
-    base_url = "{}://{}".format(http_schema, module.params["baseuri"])
+    base_url = "{0}://{1}".format(http_schema, module.params["baseuri"])
     redfishClient = redfish_client(
         base_url=base_url,
         username=module.params["username"],

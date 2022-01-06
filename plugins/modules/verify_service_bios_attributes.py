@@ -104,7 +104,8 @@ RETURN = r"""
     type: str
   failure case 6:
     description: Getting Service settings failed
-    returned: GET on /redfish/v1/systems/1/bios/service/settings/ Failed, Status <Status code>, Response <API response> (or) GET on /redfish/v1/systems/1/bios/oem/hpe/service/settings/ Failed, Status <Status code>, Response <API response>
+    returned: GET on /redfish/v1/systems/1/bios/service/settings/ Failed, Status <Status code>, Response <API response> (or)
+     GET on /redfish/v1/systems/1/bios/oem/hpe/service/settings/ Failed, Status <Status code>, Response <API response>
     corrective_action: Verify the response in the output message
     type: str
   failure case 7:
@@ -216,7 +217,7 @@ def main():
     password = module.params["password"]
     http_schema = module.params["http_schema"]
 
-    base_url = "{}://{}".format(http_schema, baseuri)
+    base_url = "{0}://{1}".format(http_schema, baseuri)
     redfishClient = redfish_client(
         base_url=base_url, username=username, password=password
     )

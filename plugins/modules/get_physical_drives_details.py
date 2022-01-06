@@ -105,7 +105,8 @@ RETURN = r"""
     type: str
   failure case 8:
     description: Getting specific physical drive details failed
-    returned: GET on /redfish/v1/Systems/1/SmartStorage/ArrayControllers/<controller_ID>/DiskDrives/<physical_drive_ID>/ Failed, Status <Status code>, Response <API response>
+    returned: GET on /redfish/v1/Systems/1/SmartStorage/ArrayControllers/<controller_ID>/DiskDrives/<physical_drive_ID>/ Failed, Status <Status code>,
+     Response <API response>
     corrective_action: Verify the response in the output message
     type: str
 """
@@ -207,7 +208,7 @@ if __name__ == "__main__":
         module.fail_json(msg=missing_required_lib("redfish"))
 
     http_schema = module.params["http_schema"]
-    base_url = "{}://{}".format(http_schema, module.params["baseuri"])
+    base_url = "{0}://{1}".format(http_schema, module.params["baseuri"])
     redfishClient = redfish_client(
         base_url=base_url,
         username=module.params["username"],
