@@ -1,7 +1,7 @@
 ---
 # tasks file for getfirmupdate
 - name: Get Firmware Update Capabilities
-  redfish_info:
+  community.general.redfish_info:
     category: Update
     command: GetFirmwareUpdateCapabilities
     baseuri: "{{ baseuri }}"

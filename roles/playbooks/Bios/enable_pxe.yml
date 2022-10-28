@@ -10,7 +10,7 @@
 
   tasks:
     - name: Create session
-      redfish_command:
+      community.general.redfish_command:
         category: Sessions
         command: CreateSession
         baseuri: "{{ baseuri }}"
@@ -19,7 +19,7 @@
       register: result
 
     - name: Set {{ bios_attr }}
-      redfish_config:
+      community.general.redfish_config:
         category: Systems
         command: SetBiosAttributes
         bios_attributes: "{{ bios_attr }}"
@@ -30,7 +30,7 @@
       register: bios_attribute
 
     - name: Reboot system to apply new BIOS settings
-      redfish_command:
+      community.general.redfish_command:
         category: Systems
         command: PowerReboot
         baseuri: "{{ baseuri }}"
@@ -40,7 +40,7 @@
       when: bios_attribute.changed
 
     - name: Delete session using security token created by CreateSesssion above
-      redfish_command:
+      community.general.redfish_command:
         category: Sessions
         command: DeleteSession
         baseuri: "{{ baseuri }}"

@@ -1,0 +1,11 @@
+---
+# tasks file for get_software_inventory
+- name: Get Software Inventory
+  community.general.redfish_info:
+    category: Update
+    command: GetSoftwareInventory
+    baseuri: "{{ baseuri }}"
+    # username: "{{ username }}"
+    # password: "{{ password }}"
+    auth_token: "{{ result.session.token }}"
+  register: result_attr

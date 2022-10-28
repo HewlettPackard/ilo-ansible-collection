@@ -1,0 +1,11 @@
+---
+# tasks file for get_manager_inventory
+- name: Get Manager Inventory
+  community.general.redfish_info:
+    category: Manager
+    command: GetManagerInventory
+    baseuri: "{{ baseuri }}"
+    # username: "{{ username }}"
+    # password: "{{ password }}"
+    auth_token: "{{ result.session.token }}"
+  register: result_attr

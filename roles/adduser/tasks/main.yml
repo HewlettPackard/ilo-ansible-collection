@@ -1,7 +1,7 @@
 ---
 # tasks file for adduser
 - name: Add user
-  redfish_command:
+  community.general.redfish_command:
     category: Accounts
     command: AddUser
     baseuri: "{{ baseuri }}"

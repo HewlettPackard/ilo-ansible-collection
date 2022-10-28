@@ -11,7 +11,7 @@
 
   tasks:
     - name: Create session
-      redfish_command:
+      community.general.redfish_command:
         category: Sessions
         command: CreateSession
         baseuri: "{{ baseuri }}"
@@ -20,7 +20,7 @@
       register: result
 
     - name: Set Manager NIC
-      redfish_config:
+      community.general.redfish_config:
         category: Manager
         command: SetManagerNic
         nic_config:
@@ -31,7 +31,7 @@
         auth_token: "{{ result.session.token }}"
 
     - name: Delete session using security token created by CreateSesssion above
-      redfish_command:
+      community.general.redfish_command:
         category: Sessions
         command: DeleteSession
         baseuri: "{{ baseuri }}"

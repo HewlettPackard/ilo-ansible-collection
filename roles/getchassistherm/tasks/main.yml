@@ -1,7 +1,7 @@
 ---
 # tasks file for getchassistherm
 - name: Get chassis thermals
-  redfish_info:
+  community.general.redfish_info:
     category: Chassis
     command: GetChassisThermals
     baseuri: "{{ baseuri }}"

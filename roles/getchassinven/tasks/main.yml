@@ -1,7 +1,7 @@
 ---
 # tasks file for getchassinven
 - name: Get chassis Inventory
-  redfish_info:
+  community.general.redfish_info:
     category: Chassis
     command: GetChassisInventory
     baseuri: "{{ baseuri }}"

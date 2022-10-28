@@ -1,7 +1,7 @@
 ---
 # tasks file for getmnicinven
 - name: Get Manager NIC inventory
-  redfish_info:
+  community.general.redfish_info:
     category: Manager
     command: GetManagerNicInventory
     baseuri: "{{ baseuri }}"

@@ -1,7 +1,7 @@
 ---
 # tasks file for getmeminven
 - name: Get memory inventory
-  redfish_info:
+  community.general.redfish_info:
     category: Systems
     command: GetMemoryInventory
     baseuri: "{{ baseuri }}"

@@ -1,7 +1,7 @@
 ---
 # tasks file for poweron
 - name: Turn system power on
-  redfish_command:
+  community.general.redfish_command:
     category: Systems
     command: PowerOn
     baseuri: "{{ baseuri }}"

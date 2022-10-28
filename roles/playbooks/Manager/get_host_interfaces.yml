@@ -1,0 +1,46 @@
+---
+- hosts: myhosts
+  connection: local
+  name: Manager Host Interfaces
+  gather_facts: False
+  # vars_files: iLO_redfish.yml
+
+  vars:
+    datatype: HostInterfaces
+
+  tasks:
+
+  - name: Create session
+    community.general.redfish_command:
+      category: Sessions
+      command: CreateSession
+      baseuri: "{{ baseuri }}"
+      username: "{{ username }}"
+      password: "{{ password }}"
+    register: result
+
+  - name: Set output file
+    include_tasks: create_output_file.yml
+
+  - name: Get Host Interfaces
+    community.general.redfish_info:
+      category: Manager
+      command: GetHostInterfaces
+      baseuri: "{{ baseuri }}"
+      # username: "{{ username }}"
+      # password: "{{ password }}"
+      auth_token: "{{ result.session.token }}"
+    register: result_vm
+
+  - name: Copy results to output file
+    copy:
+      content: "{{ result_vm | to_nice_json }}"
+      dest: "{{ template }}.json"
+
+  - name: Delete session using security token created by CreateSesssion above
+    community.general.redfish_command:
+      category: Sessions
+      command: DeleteSession
+      baseuri: "{{ baseuri }}"
+      auth_token: "{{ result.session.token }}"
+      session_uri: "{{ result.session.uri }}"

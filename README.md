@@ -24,3 +24,12 @@ To install in ansible default or defined paths use:
 ```
 ansible-galaxy collection install hpe.ilo
 ```
+
+## Ansible set up
+To install Ansible and Community general package use:
+```
+sudo python -m pip install ansible
+```
+```
+ansible galaxy collection install community.general
+```

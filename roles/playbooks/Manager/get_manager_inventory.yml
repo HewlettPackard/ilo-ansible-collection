@@ -1,0 +1,45 @@
+---
+- hosts: myhosts
+  connection: local
+  name: Manager Inventory
+  gather_facts: False
+  # vars_files: iLO_redfish.yml
+
+  vars:
+    datatype: ManagerInventory
+
+  tasks:
+    - name: Create session
+      community.general.redfish_command:
+        category: Sessions
+        command: CreateSession
+        baseuri: "{{ baseuri }}"
+        username: "{{ username }}"
+        password: "{{ password }}"
+      register: result
+
+    - name: Set output file
+      include_tasks: create_output_file.yml
+
+    - name: Get Manager Inventory
+      community.general.redfish_info:
+        category: Manager
+        command: GetManagerInventory
+        baseuri: "{{ baseuri }}"
+        # username: "{{ username }}"
+        # password: "{{ password }}"
+        auth_token: "{{ result.session.token }}"
+      register: result_fw
+
+    - name: Copy results to output file
+      copy:
+        content: "{{ result_fw | to_nice_json }}"
+        dest: "{{ template }}.json"
+
+    - name: Delete session using security token created by CreateSesssion above
+      community.general.redfish_command:
+        category: Sessions
+        command: DeleteSession
+        baseuri: "{{ baseuri }}"
+        auth_token: "{{ result.session.token }}"
+        session_uri: "{{ result.session.uri }}"

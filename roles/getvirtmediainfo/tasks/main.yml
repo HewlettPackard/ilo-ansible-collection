@@ -1,7 +1,7 @@
 ---
 # tasks file for getvirtmediainfo
 - name: Get Virtual Media information
-  redfish_info:
+  community.general.redfish_info:
     category: Manager
     command: GetVirtualMedia
     baseuri: "{{ baseuri }}"

@@ -1,7 +1,7 @@
 ---
 # tasks file for iLOreset
 - name: Restart Manager gracefully
-  redfish_command:
+  community.general.redfish_command:
     category: Manager
     command: GracefulRestart
     baseuri: "{{ baseuri }}"

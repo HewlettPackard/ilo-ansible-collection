@@ -16,7 +16,7 @@
 
   tasks:
     - name: Create session
-      redfish_command:
+      community.general.redfish_command:
         category: Sessions
         command: CreateSession
         baseuri: "{{ baseuri }}"
@@ -25,7 +25,7 @@
       register: result
 
     - name: Set {{ ntp_atrrname }} to {{ ntp_attrvalue }}
-      ilo_redfish_config:
+      community.general.ilo_redfish_config:
         category: Manager
         command: SetNTPServers
         baseuri: "{{ baseuri }}"
@@ -37,7 +37,7 @@
 
 
     - name: Set DNS Server to {{ dns_server }}
-      ilo_redfish_config:
+      community.general.ilo_redfish_config:
         category: Manager
         command: SetDNSserver
         baseuri: "{{ baseuri }}"
@@ -48,7 +48,7 @@
         auth_token: "{{ result.session.token }}"
 
     - name: Set Domain name to {{ domain_name }}
-      ilo_redfish_config:
+      community.general.ilo_redfish_config:
         category: Manager
         command: SetDomainName
         baseuri: "{{ baseuri }}"
@@ -59,7 +59,7 @@
         auth_token: "{{ result.session.token }}"
 
     - name: Disable {{ WINS_attrname }}
-      ilo_redfish_config:
+      community.general.ilo_redfish_config:
         category: Manager
         command: SetWINSReg
         baseuri: "{{ baseuri }}"
@@ -69,7 +69,7 @@
         auth_token: "{{ result.session.token }}"
 
     - name: Set HostName
-      redfish_config:
+      community.general.redfish_config:
         category: Manager
         command: SetManagerNic
         nic_config:
@@ -80,7 +80,7 @@
         auth_token: "{{ result.session.token }}"
 
     - name: Delete session using security token created by CreateSesssion above
-      redfish_command:
+      community.general.redfish_command:
         category: Sessions
         command: DeleteSession
         baseuri: "{{ baseuri }}"

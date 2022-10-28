@@ -15,7 +15,7 @@
 
   tasks:
     - name: Create session
-      redfish_command:
+      community.general.redfish_command:
         category: Sessions
         command: CreateSession
         baseuri: "{{ baseuri }}"
@@ -24,7 +24,7 @@
       register: result
 
     - name: Set one-time boot device to {{ bootdevice }}
-      redfish_command:
+      community.general.redfish_command:
         category: Systems
         command: SetOneTimeBoot
         bootdevice: "{{ bootdevice }}"
@@ -35,7 +35,7 @@
       register: bios_onetimeboot
 
     - name: Reboot system
-      redfish_command:
+      community.general.redfish_command:
         category: Systems
         command: PowerReboot
         baseuri: "{{ baseuri }}"
@@ -45,7 +45,7 @@
       when: bios_onetimeboot.changed
 
     - name: Delete session using security token created by CreateSesssion above
-      redfish_command:
+      community.general.redfish_command:
         category: Sessions
         command: DeleteSession
         baseuri: "{{ baseuri }}"

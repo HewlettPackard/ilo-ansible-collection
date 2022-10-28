@@ -1,7 +1,7 @@
 ---
 # tasks file for getsessions
 - name: Get sessions
-  ilo_redfish_info:
+  community.general.ilo_redfish_info:
     category: Sessions
     command: GetiLOSessions
     baseuri: "{{ baseuri }}"

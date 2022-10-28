@@ -1,5 +1,5 @@
 - name: Set NTP Servers
-  ilo_redfish_config:
+  community.general.ilo_redfish_config:
     category: Manager
     command: SetNTPServers
     baseuri: "{{ baseuri }}"
@@ -10,7 +10,7 @@
     #auth_token: "{{ result.session.token }}"
 
 - name: Set DNS Server
-  ilo_redfish_config:
+  community.general.ilo_redfish_config:
     category: Manager
     command: SetDNSserver
     baseuri: "{{ baseuri }}"
@@ -21,7 +21,7 @@
     #auth_token: "{{ result.session.token }}"
 
 - name: Set Domain name
-  ilo_redfish_config:
+  community.general.ilo_redfish_config:
     category: Manager
     command: SetDomainName
     baseuri: "{{ baseuri }}"
@@ -32,7 +32,7 @@
     #auth_token: "{{ result.session.token }}"
 
 - name: Disable WINS Reg
-  ilo_redfish_config:
+  community.general.ilo_redfish_config:
     category: Manager
     command: SetWINSReg
     baseuri: "{{ baseuri }}"
@@ -42,7 +42,7 @@
     #auth_token: "{{ result.session.token }}"
 
 - name: Set TimeZone
-  ilo_redfish_config:
+  community.general.ilo_redfish_config:
     category: Manager
     command: SetTimeZone
     baseuri: "{{ baseuri }}"

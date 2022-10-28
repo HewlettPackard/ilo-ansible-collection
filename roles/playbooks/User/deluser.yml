@@ -10,7 +10,7 @@
 
   tasks:
     - name: Create session
-      redfish_command:
+      community.general.redfish_command:
         category: Sessions
         command: CreateSession
         baseuri: "{{ baseuri }}"
@@ -19,7 +19,7 @@
       register: result
 
     - name: Delete user
-      redfish_command:
+      community.general.redfish_command:
         category: Accounts
         command: DeleteUser
         baseuri: "{{ baseuri }}"
@@ -30,7 +30,7 @@
 
 
     - name: Delete session using security token created by CreateSesssion above
-      redfish_command:
+      community.general.redfish_command:
         category: Sessions
         command: DeleteSession
         baseuri: "{{ baseuri }}"

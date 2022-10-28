@@ -1,7 +1,7 @@
 ---
 # tasks file for getfirminven
 - name: Get Firmware Inventory
-  redfish_info:
+  community.general.redfish_info:
     category: Update
     command: GetFirmwareInventory
     baseuri: "{{ baseuri }}"

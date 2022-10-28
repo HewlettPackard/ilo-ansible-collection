@@ -1,7 +1,7 @@
 ---
 # tasks file for listallusers
 - name: List all users
-  redfish_info:
+  community.general.redfish_info:
     category: Accounts
     command: ListUsers
     baseuri: "{{ baseuri }}"
