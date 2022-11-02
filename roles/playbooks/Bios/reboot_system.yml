@@ -3,15 +3,6 @@
   connection: local
   name: Set one-time BIOS boot device
   gather_facts: False
-  # vars_files: iLO_redfish.yml
-
-  # ONLY WORKS IN LEGACY BIOS MODE!
-  #
-  # Bootdevice options include: None, Pxe, Cd, Floppy, Hdd, BiosSetup,
-  # Utilities, UefiTarget & SDCard.
-
-  vars:
-    - bootdevice: Pxe
 
   tasks:
     - name: Create session
@@ -23,16 +14,14 @@
         password: "{{ password }}"
       register: result
 
-    - name: Set one-time boot device to {{ bootdevice }}
+    - name: Reboot system
       community.general.redfish_command:
         category: Systems
-        command: SetOneTimeBoot
-        bootdevice: "{{ bootdevice }}"
+        command: PowerReboot
         baseuri: "{{ baseuri }}"
         # username: "{{ username }}"
         # password: "{{ password }}"
         auth_token: "{{ result.session.token }}"
-      register: bios_onetimeboot
 
     - name: Delete session using security token created by CreateSesssion above
       community.general.redfish_command:

@@ -9,5 +9,5 @@
     username: "{{ username }}"
     password: "{{ password }}"
   register: bios_attribute
-  notify:
-    - Reboot system to apply new BIOS settings
+  # notify:
+  #   - Reboot system to apply new BIOS settings
