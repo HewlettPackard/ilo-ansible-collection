@@ -1,0 +1,15 @@
+---
+# tasks file for flashfwpkg
+- name: Flashfwpkg
+  ilo_redfish_command:
+    category: UpdateService
+    command: Flashfwpkg
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    fwpkg_file: "{{ fwpkg_file }}"
+    update_srs: "{{ update_srs | default('False') }}"
+    force: "{{force | default('True') }}"
+    componentsig: "{{componentsig | default('') }}"
+    overwrite: "{{overwrite | default('false') }}"
+    tover: "{{overwrite | default('false') }}"

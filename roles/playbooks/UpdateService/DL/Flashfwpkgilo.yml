@@ -1,0 +1,16 @@
+---
+- hosts: myhosts
+  connection: local
+  name: Update service iLO5
+  gather_facts: False
+
+  tasks:
+    - name: Flashfwpkg
+      ilo_redfish_command:
+        category: UpdateService
+        command: Flashfwpkg
+        baseuri: "{{ baseuri }}"
+        username: "{{ username }}"
+        password: "{{ password }}"
+        fwpkg_file: ilo5_272.fwpkg
+

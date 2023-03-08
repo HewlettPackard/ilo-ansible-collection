@@ -33,3 +33,6 @@ sudo python -m pip install ansible
 ```
 ansible galaxy collection install community.general
 ```
+```
+pip install python-ilorest-library
+```

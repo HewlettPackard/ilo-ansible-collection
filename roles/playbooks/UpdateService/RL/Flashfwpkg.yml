@@ -1,0 +1,15 @@
+---
+- hosts: myhosts
+  connection: local
+  name: Update service UBM6
+  gather_facts: False
+
+  tasks:
+    - name: Flashfwpkg
+      ilo_redfish_command:
+        category: UpdateService
+        command: Flashfwpkg
+        baseuri: "{{ baseuri }}"
+        username: "{{ username }}"
+        password: "{{ password }}"
+        fwpkg_file: HPE_UBM6_1.02_C.fwpkg

@@ -1,0 +1,15 @@
+---
+- hosts: myhosts
+  connection: local
+  name: Upload iLO5 component
+  gather_facts: False
+
+  tasks:
+    - name: Upload component
+      ilo_redfish_command:
+        category: UpdateService
+        command: UploadComponent
+        baseuri: "{{ baseuri }}"
+        username: "{{ username }}"
+        password: "{{ password }}"
+        fwpkg_file: ilo6_105.fwpkg

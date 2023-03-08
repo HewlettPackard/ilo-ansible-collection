@@ -1,0 +1,16 @@
+---
+# tasks file for uploadcomp
+- name: Upload component
+  ilo_redfish_command:
+    category: UpdateService
+    command: UploadComponent
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    fwpkg_file: "{{ fwpkg_file }}"
+    update_repository: "{{ update_repository | default('True') }}"
+    update_target: "{{ update_target | default('False') }}"
+    update_srs: "{{ update_srs | default('False') }}"
+    force: "{{force | default('True') }}"
+    componentsig: "{{componentsig | default('') }}"
+    overwrite: "{{overwrite | default('false') }}"

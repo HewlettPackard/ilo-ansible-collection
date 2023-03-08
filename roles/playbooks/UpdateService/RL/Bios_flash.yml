@@ -1,0 +1,31 @@
+---
+- hosts: myhosts
+  connection: local
+  name: Update service
+  gather_facts: False
+
+  tasks:
+    - name: Shutdown system power gracefully
+      community.general.redfish_command:
+        category: Systems
+        command: PowerGracefulShutdown
+        baseuri: "{{ baseuri }}"
+        username: "{{ username }}"
+        password: "{{ password }}"
+
+    - name: Flashfwpkg
+      ilo_redfish_command:
+        category: UpdateService
+        command: Flashfwpkg
+        baseuri: "{{ baseuri }}"
+        username: "{{ username }}"
+        password: "{{ password }}"
+        fwpkg_file: R11_1.10_11_21_2022_SCP_2.10_appended.fwpkg
+
+    - name: Turn system power on
+      community.general.redfish_command:
+        category: Systems
+        command: PowerOn
+        baseuri: "{{ baseuri }}"
+        username: "{{ username }}"
+        password: "{{ password }}"
