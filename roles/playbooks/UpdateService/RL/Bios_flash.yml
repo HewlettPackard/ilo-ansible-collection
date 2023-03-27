@@ -5,16 +5,16 @@
   gather_facts: False
 
   tasks:
-    - name: Shutdown system power gracefully
+    - name: Turn system power off
       community.general.redfish_command:
         category: Systems
-        command: PowerGracefulShutdown
+        command: PowerForceOff
         baseuri: "{{ baseuri }}"
         username: "{{ username }}"
         password: "{{ password }}"
 
     - name: Flashfwpkg
-      ilo_redfish_command:
+      ilo_fwupdate_command:
         category: UpdateService
         command: Flashfwpkg
         baseuri: "{{ baseuri }}"

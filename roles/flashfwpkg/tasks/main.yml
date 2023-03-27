@@ -1,7 +1,7 @@
 ---
 # tasks file for flashfwpkg
 - name: Flashfwpkg
-  ilo_redfish_command:
+  ilo_fwupdate_command:
     category: UpdateService
     command: Flashfwpkg
     baseuri: "{{ baseuri }}"

@@ -6,7 +6,7 @@
   # vars_files: iLO_redfish.yml
 
   vars:
-    - dns_server: 0.0.0.0
+    - dns_server: 1.1.1.1 2.2.2.2
     - domain_name: tst.sgp.hp.mfg
 
   tasks:

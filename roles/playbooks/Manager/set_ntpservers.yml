@@ -7,7 +7,7 @@
 
   vars:
     - attribute_name: StaticNTPServers
-    - attribute_value: 1.2.3.4
+    - attribute_value: 1.1.1.1
 
   tasks:
     - name: Create session

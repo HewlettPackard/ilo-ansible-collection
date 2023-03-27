@@ -6,7 +6,7 @@
 
   tasks:
     - name: Upload component
-      ilo_redfish_command:
+      ilo_fwupdate_command:
         category: UpdateService
         command: UploadComponent
         baseuri: "{{ baseuri }}"
