@@ -1,0 +1,13 @@
+---
+- name: Enable Certificate Login
+  ilo_security:
+    category: Manager
+    command: EnableCertificateLogin
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+  register: result
+
+- name: Status
+  debug:
+    msg: "{{ result }}"

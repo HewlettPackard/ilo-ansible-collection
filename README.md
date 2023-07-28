@@ -31,7 +31,7 @@ To install Ansible and Community general package use:
 sudo python -m pip install ansible
 ```
 ```
-ansible galaxy collection install community.general
+ansible-galaxy collection install community.general
 ```
 ```
 pip install python-ilorest-library

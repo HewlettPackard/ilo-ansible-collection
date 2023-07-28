@@ -1,16 +1,8 @@
-Verify Logical Drive
+Verify Logical Drives
 =========
 
 Verifying logical drives details in a given server
 
-Requirements
-------------
-
-This module requires python redfish library and ansible. You can install these packages using pip as shown below
-```
-pip3 install ansible==4.5.0 ansible-core==2.11.5
-pip3 install redfish==3.0.2
-```
 Role Variables
 --------------
 
@@ -51,20 +43,18 @@ Example Playbook
 ----------------
 
 ```
-- name: verify logical drives
-  verify_logical_drives:
-    baseuri: "***.***.***.***"
-    username: "abcxyz"
-    password: "******"
-    raid_details: [{"LogicalDriveName": "LD1",
-                     "Raid": "Raid1",
-                     "DataDrives": {
-                        "DataDriveCount": 2,
-                        "DataDriveMediaType": "HDD",
-                        "DataDriveInterfaceType": "SAS",
-                        "DataDriveMinimumSizeGiB": 0
-                        }
-                    }]
+- hosts: servers
+  vars:
+    raid_details:
+      - LogicalDriveName: LD1
+        Raid: Raid1
+        DataDrives:
+            DataDriveCount: 2
+            DataDriveMediaType: HDD
+            DataDriveInterfaceType: SAS
+            DataDriveMinimumSizeGiB: 0
+  roles:
+    - verify_logical_drives
 ```
 
 License

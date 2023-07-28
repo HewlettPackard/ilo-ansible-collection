@@ -1,0 +1,15 @@
+---
+- name: Perform firmware upload to ilo repository
+  ilo_firmware:
+    category: UpdateService
+    command: FirmwareUpload
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    image_uri: "{{ image_uri }}"
+    file_name: "{{ file_name }}"
+  register: result
+
+- name: Status
+  debug:
+    msg: "{{ result }}"

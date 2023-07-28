@@ -1,0 +1,14 @@
+---
+- name: Verify specified logical drives
+  ilo_storage:
+    category: Systems
+    command: VerifySpecifiedLogicalDrives
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    raid_details: "{{ raid_details }}"
+  register: result
+
+- name: Logical drives verification status
+  debug:
+    msg: "{{ result }}"

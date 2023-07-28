@@ -1,0 +1,13 @@
+---
+- name: Delete the iLO backup file(s) if already present
+  ilo_manage:
+    category: Manager
+    command: DeleteiLOBackupFiles
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+  register: result
+
+- name: Status
+  debug:
+    msg: "{{ result }}"

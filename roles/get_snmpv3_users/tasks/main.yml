@@ -1,6 +1,8 @@
 ---
 - name: Get SNMPv3 users
-  get_snmpv3_users:
+  ilo_snmp:
+    category: Manager
+    command: GetSNMPv3Users
     baseuri: "{{ baseuri }}"
     username: "{{ username }}"
     password: "{{ password }}"

@@ -1,0 +1,60 @@
+---
+- name: Check whether install set file exists on the VM
+  stat:
+    path: "{{ install_set }}"
+  register: install_set_file_exists
+
+- fail:
+    msg: "Install set file is not present on the VM, in the file path {{ install_set }}"
+  when: not install_set_file_exists.stat.exists
+
+- name: Read install set file
+  set_fact:
+    input_file: "{{ lookup('file', '{{ install_set }}') | from_json }}"
+
+- name: Check whether maintenance window is provided
+  set_fact:
+    maintenance_window: "{{ True if input_file.maintenance_window is defined else False}}"
+
+- name: Block for firmware upgradation without maintenance window
+  block:
+    - name: Perform firmware upgrade on the server without maintenance window through install set URL
+      ilo_firmware:
+        category: UpdateService
+        command: UpdateFirmwareThroughInstallSet
+        baseuri: "{{ baseuri }}"
+        username: "{{ username }}"
+        password: "{{ password }}"
+        install_set_attributes:
+          Name: "{{ input_file.install_set_name }}"
+          Description: "{{ input_file.Description | default('')}}"
+          Install_set_sequence: "{{ input_file.install_set_sequence }}"
+      register: firmware_upgrade_rsp
+
+    - name: Status
+      debug:
+        msg: "{{ firmware_upgrade_rsp }}"
+
+  when: not maintenance_window
+
+- name: Block for firmware upgradation with maintenance window
+  block:
+    - name: Perform firmware upgrade on the server with maintenance window through install set URL
+      ilo_firmware:
+        category: UpdateService
+        command: UpdateFirmwareThroughInstallSet
+        baseuri: "{{ baseuri }}"
+        username: "{{ username }}"
+        password: "{{ password }}"
+        install_set_attributes:
+          Name: "{{ input_file.install_set_name }}"
+          Description: "{{ input_file.Description | default('')}}"
+          Install_set_sequence: "{{ input_file.install_set_sequence }}"
+        maintenance_window_details: "{{ input_file.maintenance_window}}"
+      register: firmware_upgrade_rsp
+
+    - name: Status
+      debug:
+        msg: "{{ firmware_upgrade_rsp }}"
+
+  when: maintenance_window

@@ -1,16 +1,69 @@
 ---
 - hosts: myhosts
   connection: local
-  gather_facts: false
-  tasks:  
-    - name: Verify input Boot Order against the server boot order
-      verify_uefi_boot_order:
-        baseuri: "{{ baseuri }}"
-        username: "{{ username }}"
-        password: "{{ password }}"
-        uefi_boot_order: "{{ uefi_boot_order }}"
-      register: boot_verification_status
+  gather_facts: False
+  tasks:
+    - name: Validate input provided by user
+      fail:
+        msg: "username/password or cert_file/key_file or auth_token is mandatory"
+      when:
+        - (username is not defined or password is not defined) and (cert_file is not defined or key_file is not defined) and (auth_token is not defined)
 
-    - name: BootOrder verification status
-      debug:
-        msg: "{{ boot_verification_status }}"
+    - name: Fail when more than one valid authentication method is provided
+      fail:
+        msg: "Only one authentication method is allowed. Provide either username/password or cert_file/key_file or auth_token."
+      when:
+        - ((username is defined or password is defined) and (cert_file is defined or key_file is defined) and auth_token is defined) or
+          ((username is defined or password is defined) and (cert_file is defined or key_file is defined)) or
+          ((username is defined or password is defined) and auth_token is defined) or
+          ((cert_file is defined or key_file is defined) and auth_token is defined)
+
+    - name: Verify input boot order against server boot order when username and password are defined
+      block:
+        - ilo_boot:
+            category: Systems
+            command: VerifyUefiBootOrder
+            baseuri: "{{ baseuri }}"
+            username: "{{ username }}"
+            password: "{{ password }}"
+            uefi_boot_order: "{{ uefi_boot_order }}"
+          register: boot_verification_status
+
+        - name: Boot order verification status
+          debug:
+            msg: "{{ boot_verification_status }}"
+
+      when: username is defined and password is defined
+
+    - name: Verify input boot order against server boot order when cert_file and key_file are defined
+      block:
+        - ilo_boot:
+            category: Systems
+            command: VerifyUefiBootOrder
+            baseuri: "{{ baseuri }}"
+            cert_file: "{{ cert_file }}"
+            key_file: "{{ key_file }}"
+            uefi_boot_order: "{{ uefi_boot_order }}"
+          register: boot_verification_status
+
+        - name: Boot order verification status
+          debug:
+            msg: "{{ boot_verification_status }}"
+
+      when: cert_file is defined and key_file is defined
+
+    - name: Verify input boot order against server boot order when auth_token is defined
+      block:
+        - ilo_boot:
+            category: Systems
+            command: VerifyUefiBootOrder
+            baseuri: "{{ baseuri }}"
+            auth_token: "{{ auth_token }}"
+            uefi_boot_order: "{{ uefi_boot_order }}"
+          register: boot_verification_status
+
+        - name: Boot order verification status
+          debug:
+            msg: "{{ boot_verification_status }}"
+
+      when: auth_token is defined

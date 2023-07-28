@@ -1,6 +1,6 @@
 galaxy_info:
   author: Varini HP
-  description: deleted all the logical drive
+  description: Deletes all the logical drives in a given server
   company: Hewlett Packard Enterprise
 
   # If the issue tracker for your role is not on github, uncomment the

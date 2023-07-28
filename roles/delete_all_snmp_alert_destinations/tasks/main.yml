@@ -1,0 +1,13 @@
+---
+- name: Deleting all SNMP Alert Destinations
+  ilo_snmp:
+    category: Manager
+    command: DeleteAllSNMPAlertDestinations
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+  register: result
+
+- name: Status
+  debug:
+    msg: "{{ result }}"

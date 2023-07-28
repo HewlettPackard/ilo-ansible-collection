@@ -13,4 +13,3 @@
         username: "{{ username }}"
         password: "{{ password }}"
         fwpkg_file: ilo5_272.fwpkg
-

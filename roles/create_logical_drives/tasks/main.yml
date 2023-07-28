@@ -1,6 +1,8 @@
 ---
 - name: Create logical drives
-  create_logical_drives:
+  ilo_storage:
+    category: Systems
+    command: CreateLogicalDrives
     baseuri: "{{ baseuri }}"
     username: "{{ username }}"
     password: "{{ password }}"

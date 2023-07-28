@@ -1,0 +1,14 @@
+---
+- name: Create logical drives with particular physical drives
+  ilo_storage:
+    category: Systems
+    command: CreateLogicalDrivesWithParticularPhysicalDrives
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    raid_details: "{{ raid_details }}"
+  register: result
+
+- name: Status
+  debug:
+    msg: "{{ result }}"

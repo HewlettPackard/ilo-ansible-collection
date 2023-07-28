@@ -1,6 +1,8 @@
 ---
 - name: Get SNMP alert destinations
-  get_snmp_alert_destinations:
+  ilo_snmp:
+    category: Manager
+    command: GetSNMPAlertDestinations
     baseuri: "{{ baseuri }}"
     username: "{{ username }}"
     password: "{{ password }}"

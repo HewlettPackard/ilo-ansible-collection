@@ -1,6 +1,8 @@
 ---
 - name: Verify input Boot Order against the server boot order
-  verify_uefi_boot_order:
+  ilo_boot:
+    category: Systems
+    command: VerifyUefiBootOrder
     baseuri: "{{ baseuri }}"
     username: "{{ username }}"
     password: "{{ password }}"

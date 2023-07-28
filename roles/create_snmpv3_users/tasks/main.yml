@@ -1,6 +1,8 @@
 ---
 - name: Creating SNMPv3 users
-  create_snmpv3_users:
+  ilo_snmp:
+    category: Manager
+    command: CreateSNMPv3Users
     baseuri: "{{ baseuri }}"
     username: "{{ username }}"
     password: "{{ password }}"

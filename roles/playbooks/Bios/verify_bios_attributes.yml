@@ -3,61 +3,67 @@
   connection: local
   gather_facts: False
   tasks:
-  - name: profile_attributes and bios_attributes is present
-    set_fact:
-      bios_config: "{{ profile_attributes | combine( bios_attributes ) }}"
-    when:
-      - bios_attributes
-      - profile_attributes
+    - name: Validate input provided by user
+      fail:
+        msg: "username/password or cert_file/key_file or auth_token is mandatory"
+      when:
+        - (username is not defined or password is not defined) and (cert_file is not defined or key_file is not defined) and (auth_token is not defined)
 
-  - name: profile_attributes is present and bios_attributes is empty
-    set_fact:
-      bios_config: "{{ profile_attributes }}"
-    when:
-      - not bios_attributes
-      - profile_attributes
+    - name: Fail when more than one valid authentication method is provided
+      fail:
+        msg: "Only one authentication method is allowed. Provide either username/password or cert_file/key_file or auth_token."
+      when:
+        - ((username is defined or password is defined) and (cert_file is defined or key_file is defined) and auth_token is defined) or
+          ((username is defined or password is defined) and (cert_file is defined or key_file is defined)) or
+          ((username is defined or password is defined) and auth_token is defined) or
+          ((cert_file is defined or key_file is defined) and auth_token is defined)
 
-  - name: bios_attributes is present and profile_attributes is empty
-    set_fact:
-      bios_config: "{{ bios_attributes }}"
-    when:
-      - bios_attributes
-      - not profile_attributes
+    - name: Verify BIOS attributes when username and password are defined
+      block:
+        - community.general.redfish_command:
+            category: Systems
+            command: VerifyBiosAttributes
+            baseuri: "{{ baseuri }}"
+            username: "{{ username }}"
+            password: "{{ password }}"
+            bios_attributes: "{{ bios_attributes }}"
+          register: result
 
-  - name: Fail when bios_attributes and profile_attributes is empty
-    fail:
-      msg: "'bios_attributes' is empty"
-    when:
-      - not bios_attributes
-      - not profile_attributes
+        - name: Status
+          debug:
+            msg: "{{ result }}"
 
-  - name: BIOS attributes for verification
-    debug:
-      msg: "{{ bios_config }}"
+      when: username is defined and password is defined
 
-  - name: Verify BIOS attributes
-    verify_bios_attributes:
-      baseuri: "{{ baseuri }}"
-      username: "{{ username }}"
-      password: "{{ password }}"
-      bios_attributes: "{{ bios_config }}"
-    register: result
-    ignore_errors: yes
+    - name: Verify BIOS attributes when cert_file and key_file are defined
+      block:
+        - community.general.redfish_command:
+            category: Systems
+            command: VerifyBiosAttributes
+            baseuri: "{{ baseuri }}"
+            cert_file: "{{ cert_file }}"
+            key_file: "{{ key_file }}"
+            bios_attributes: "{{ bios_attributes }}"
+          register: result
 
-  - name: Saving verification result
-    set_stats:
-      data:
-        custom: "{{ result }}"
+        - name: Status
+          debug:
+            msg: "{{ result }}"
 
-  - name: Success status
-    debug:
-      msg: "{{ result }}"
-    when: not result.failed
+      when: cert_file is defined and key_file is defined
 
-  - name: Fail status
-    fail:
-      msg: "Verification is failed: {{ result }}"
-    when: result.failed
+    - name: Verify BIOS attributes when auth_token is defined
+      block:
+        - community.general.redfish_command:
+            category: Systems
+            command: VerifyBiosAttributes
+            baseuri: "{{ baseuri }}"
+            auth_token: "{{ auth_token }}"
+            bios_attributes: "{{ bios_attributes }}"
+          register: result
 
-  vars:
-    profile_attributes: {}
+        - name: Status
+          debug:
+            msg: "{{ result }}"
+
+      when: auth_token is defined

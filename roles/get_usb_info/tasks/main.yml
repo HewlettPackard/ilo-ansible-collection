@@ -1,0 +1,13 @@
+---
+- name: Get USB information
+  ilo_storage:
+    category: Systems
+    command: GetUSBInfo
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+  register: usb_info
+
+- name: USB information in the server
+  debug:
+    msg: "{{ usb_info }}"

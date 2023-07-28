@@ -13,4 +13,3 @@
         username: "{{ username }}"
         password: "{{ password }}"
         fwpkg_file: U32_2.76_11_17_2022.fwpkg
-

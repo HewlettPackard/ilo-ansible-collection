@@ -1,6 +1,8 @@
 ---
 - name: Get network boot settings
-  get_boot_settings:
+  ilo_boot:
+    category: Systems
+    command: GetBootSettings
     baseuri: "{{ baseuri }}"
     username: "{{ username }}"
     password: "{{ password }}"

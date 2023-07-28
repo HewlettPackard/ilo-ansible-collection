@@ -1,6 +1,8 @@
 ---
-- name: verify logical drives
-  verify_logical_drives:
+- name: Verify logical drives
+  ilo_storage:
+    category: Systems
+    command: VerifyLogicalDrives
     baseuri: "{{ baseuri }}"
     username: "{{ username }}"
     password: "{{ password }}"

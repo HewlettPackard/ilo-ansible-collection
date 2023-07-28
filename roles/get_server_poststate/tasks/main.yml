@@ -1,0 +1,13 @@
+---
+- name: Get server PostState
+  ilo_power:
+    category: Systems
+    command: GetServerPostState
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+  register: server_poststate
+
+- name: Server PostState
+  debug:
+    msg: "{{ server_poststate }}"

@@ -3,15 +3,6 @@ Create SNMPv3 Users
 
 This module creates SNMPv3 users in a given server
 
-Requirements
-------------
-
-This module requires python redfish library and ansible. You can install these packages using pip as shown below
-```
-pip3 install ansible==4.5.0 ansible-core==2.11.5
-pip3 install redfish==3.0.2
-```
-
 Role Variables
 --------------
 
@@ -85,17 +76,16 @@ Example Playbook
 ----------------
 
 ```
-- name: Creating SNMPv3 users
-  create_snmpv3_users:
-    baseuri:  "***.***.***.***"
-    username: "abcxyz"
-    password: "******"
-    snmpv3_users:
-      - security_name: "Sec1"
-        auth_protocol: "SHA"
-        auth_passphrase: "********"
-        privacy_protocol: "AES"
-        privacy_passphrase: "********"
+  - hosts: servers
+    vars:
+      snmpv3_users:
+        - security_name: "Sec1"
+          auth_protocol: "SHA"
+          auth_passphrase: "********"
+          privacy_protocol: "AES"
+          privacy_passphrase: "********"
+    roles:
+       - create_snmpv3_users
 ```
 License
 -------

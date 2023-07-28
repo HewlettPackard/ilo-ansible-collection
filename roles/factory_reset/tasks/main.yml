@@ -1,0 +1,13 @@
+---
+- name: Perform factory reset on the iLO
+  ilo_manage:
+    category: Manager
+    command: iLOFactoryReset
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+  register: result
+
+- name: Status
+  debug:
+    msg: "{{ result }}"

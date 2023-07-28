@@ -1,0 +1,9 @@
+---
+# tasks file for smartcompinstall
+- name: Install Smart Component
+  ilo_fwupdate_command:
+    category: RLCP
+    command: SmtCmpInstall
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"

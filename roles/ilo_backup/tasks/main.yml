@@ -1,0 +1,13 @@
+---
+- name: Perform backup operation on the iLO
+  ilo_manage:
+    category: Manager
+    command: iLOBackup
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+  register: result
+
+- name: Status
+  debug:
+    msg: "{{ result }}"

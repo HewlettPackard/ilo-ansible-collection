@@ -1,16 +1,8 @@
-Create Logical Drive
+Create Logical Drives
 =========
 
-Creation of logical drive specified by raid_detials in a given server
- 
-Requirements
-------------
+Creates logical drives specified by raid_details in a given server
 
-This module requires python redfish library and ansible. You can install these packages using pip as shown below
-```
-pip3 install ansible==4.5.0 ansible-core==2.11.6
-pip3 install redfish==3.0.2
-```
 
 Role Variables
 --------------
@@ -31,10 +23,46 @@ Role Variables
       - Password of the server for authentication
     type: str
   raid_details:
-    required: true
     description:
-      - List of RAID details that needs to be configured in the given server
+      - List of RAID details that need to be configured in the given server.
     type: list
+    elements: dict
+    suboptions:
+      LogicalDriveName:
+        required: true
+        description:
+          - Logical drive name that needs to be configured in the given server
+        type: str
+      Raid:
+        required: true
+        description:
+          - Type of RAID
+        type: str
+      DataDrives:
+        required: true
+        description:
+          - Specifies the data drive details like media type, interface type, disk count and size
+        type: dict
+      DataDriveCount:
+        required: true
+        description:
+          - Number of physical drives that is required to create specified RAID
+        type: int
+      DataDriveMediaType:
+        required: true
+        description:
+          - Media type of the disk
+        type: str
+      DataDriveInterfaceType:
+        required: true
+        description:
+          - Interface type of the disk
+        type: str
+      DataDriveMinimumSizeGiB:
+        required: true
+        description:
+          - Minimum size required in the physical drive
+        type: int
   http_schema:
     required: false
     description:
@@ -42,29 +70,30 @@ Role Variables
     default: https
     type: str
 ```    
+
 Dependencies
 ------------
 
-No dependency
+No dependency on other modules.
 
 Example Playbook
 ----------------
 
-```
-- name: Create logical drives
-  create_logical_drives:
-    baseuri: "***.***.***.***"
-    username: "abcxyz"
-    password: "******"
-    raid_details: [{"LogicalDriveName": "LD1",
-                     "Raid": "Raid1",
-                     "DataDrives": {
-                        "DataDriveCount": 2,
-                        "DataDriveMediaType": "HDD",
-                        "DataDriveInterfaceType": "SAS",
-                        "DataDriveMinimumSizeGiB": 0
-                        }
-                   }]
+An example of how to use the role:
+
+``` 
+- hosts: servers
+  vars:
+    raid_details: 
+      - LogicalDriveName: "LD1"
+        Raid: "Raid1"
+        DataDrives:
+          DataDriveCount: 2
+          DataDriveMediaType: "HDD"
+          DataDriveInterfaceType: "SAS"
+          DataDriveMinimumSizeGiB: 0
+  roles:
+     - create_logical_drives
 ```
 License
 -------

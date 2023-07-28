@@ -1,0 +1,13 @@
+---
+- name: Get PCI device details
+  ilo_network:
+    category: Systems
+    command: GetPCIDevices
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+  register: pci_device_details
+
+- name: PCI device details in the server
+  debug:
+    msg: "{{ pci_device_details }}"

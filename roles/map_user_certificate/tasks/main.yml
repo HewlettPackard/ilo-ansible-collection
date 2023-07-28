@@ -1,0 +1,14 @@
+---
+- name: Map User Certificate
+  ilo_security:
+    category: Manager
+    command: MapUserCertificate
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    user_cert_file: "{{ user_cert_file }}"
+  register: result
+
+- name: Status
+  debug:
+    msg: "{{ result }}"

@@ -1,0 +1,13 @@
+---
+- name: Get physical drives details
+  ilo_storage:
+    category: Systems
+    command: GetPhysicalDrives
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+  register: physical_drives_details
+
+- name: Physical drives present in the server
+  debug:
+    msg: "{{ physical_drives_details }}"

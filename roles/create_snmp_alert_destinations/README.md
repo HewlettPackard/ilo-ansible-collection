@@ -3,15 +3,6 @@ Create SNMP Alert Destinations
 
 This module creates SNMP alert destinations in a given server
 
-Requirements
-------------
-
-This module requires python redfish library and ansible. You can install these packages using pip as shown below
-```
-pip3 install ansible==4.5.0 ansible-core==2.11.5
-pip3 install redfish==3.0.2
-```
-
 Role Variables
 --------------
 
@@ -76,16 +67,15 @@ No dependency on other modules.
 Example Playbook
 ----------------
 ```
-- name: Creating SNMP alert destinations
-  create_snmp_alert_destinations:
-    baseuri: "***.***.***.***"
-    username: "abcxyz"
-    password: "******"
-    alert_destinations:
-      - snmp_alert_protocol: "SNMPv1Trap"
-        trap_community: "public"
-        destination_ip: "***.***.***.***"
-        security_name: "Sec1"
+  - hosts: servers
+    vars:
+      alert_destinations:
+        - snmp_alert_protocol: "SNMPv1Trap"
+          trap_community: "public"
+          destination_ip: "***.***.***.***"
+          security_name: "Sec1"
+    roles:
+       - create_snmp_alert_destinations
 ```
 
 License

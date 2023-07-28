@@ -1,6 +1,6 @@
 galaxy_info:
   author: Varini HP
-  description: Creates logical drives on server
+  description: Creates logical drives on a given server
   company: Hewlett Packard Enterprise
 
   # If the issue tracker for your role is not on github, uncomment the

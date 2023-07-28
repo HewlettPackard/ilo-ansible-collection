@@ -3,15 +3,6 @@ Delete All Logical Drive
 
 Deleting all logical drives in a given server
 
-Requirements
-------------
-
-This module requires python redfish library and ansible. You can install these packages using pip as shown below
-```
-pip3 install ansible==4.5.0 ansible-core==2.11.5
-pip3 install redfish==3.0.2
-```
-
 Role Variables
 --------------
 
@@ -48,11 +39,9 @@ Example Playbook
 ----------------
 
 ```
-- name: Delete all logical drives
-  delete_all_logical_drives:
-    baseuri: "***.***.***"
-    username: "abcxyz"
-    password: "******"
+- hosts: servers
+  roles:
+     - delete_all_logical_drives
 ```
 License
 -------

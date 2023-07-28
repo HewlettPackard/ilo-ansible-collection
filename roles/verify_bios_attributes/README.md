@@ -3,15 +3,6 @@ Verify BIOS attributes
 
 Verify bios attributes is to verify applied bios attributes in the server
 
-Requirements
-------------
-
-This module requires python redfish library and ansible. You can install these packages using pip as shown below
-```
-pip3 install ansible==4.5.0 ansible-core==2.11.5
-pip3 install redfish==3.0.2
-```
-
 Role Variables
 --------------
 
@@ -52,14 +43,13 @@ Example Playbook
 ----------------
 
 ```
-- name: Verify bios attributes
-  verify_bios_attributes:
-    baseuri: "***.***.***.***"
-    username: "abcxyz"
-    password: "*****"
+- hosts: servers
+  vars:
     bios_attributes:
       SubNumaClustering: "Disabled"
       WorkloadProfile: "Virtualization-MaxPerformance"
+  roles:
+    - verify_bios_attributes
 ```
 
 License

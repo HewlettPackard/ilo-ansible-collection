@@ -1,0 +1,12 @@
+---
+- name: Check User Privileges
+  ilo_manage:
+    category: Systems
+    command: CheckUserPrivileges
+    baseuri: "{{ baseuri }}"
+    auth_token: "{{ auth_token }}"
+  register: user_privileges
+
+- name: User Privileges
+  debug:
+    msg: "{{ user_privileges }}"

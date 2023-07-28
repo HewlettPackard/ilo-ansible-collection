@@ -1,0 +1,14 @@
+---
+- name: Import Trusted CA
+  ilo_security:
+    category: Manager
+    command: ImportTrustedCA
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    ca_file: "{{ ca_file }}"
+  register: result
+
+- name: Status
+  debug:
+    msg: "{{ result }}"

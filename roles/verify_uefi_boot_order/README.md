@@ -3,15 +3,6 @@ Verify UEFI Boot Order
 
 This module will verify if the input boot order matches with the server boot order or not when BiosMode is Uefi
 
-Requirements
-------------
-
-This module requires python redfish library and ansible. You can install these packages using pip as shown below
-```
-pip3 install ansible==4.5.0 ansible-core==2.11.5
-pip3 install redfish==3.0.2
-```
-
 Role Variables
 --------------
 
@@ -57,12 +48,11 @@ Example Playbook
 ----------------
 
 ```
-- name: Verify input Boot Order against the server boot order
-  verify_uefi_boot_order:
-    baseuri: "***.***.***.***"
-    username: "abcxyz"
-    password: "******"
+- hosts: servers
+  vars:
     uefi_boot_order: ["NIC.FlexLOM.1.1.IPv4"]
+  roles:
+    - verify_uefi_boot_order
 ```
 
 License

@@ -1,0 +1,13 @@
+---
+- name: Get PCI slot details
+  ilo_network:
+    category: Systems
+    command: GetPCISlots
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+  register: pci_slot_details
+
+- name: PCI slot details in the server
+  debug:
+    msg: "{{ pci_slot_details }}"

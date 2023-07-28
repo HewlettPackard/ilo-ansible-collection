@@ -1,56 +1,14 @@
 ---
-- name: profile_attributes and bios_attributes is present
-  set_fact:
-    bios_config: "{{ profile_attributes | combine( bios_attributes ) }}"
-  when:
-    - bios_attributes
-    - profile_attributes
-
-- name: profile_attributes is present and bios_attributes is empty
-  set_fact:
-    bios_config: "{{ profile_attributes }}"
-  when:
-    - not bios_attributes
-    - profile_attributes
-
-- name: bios_attributes is present and profile_attributes is empty
-  set_fact:
-    bios_config: "{{ bios_attributes }}"
-  when:
-    - bios_attributes
-    - not profile_attributes
-
-- name: Fail when bios_attributes and profile_attributes is empty
-  fail:
-    msg: "'bios_attributes' is empty"
-  when:
-    - not bios_attributes
-    - not profile_attributes
-
-- name: BIOS attributes for verification
-  debug:
-    msg: "{{ bios_config }}"
-
-- name: Verify BIOS attributes
-  verify_bios_attributes:
+- name: Verify BIOS attributes when username and password are defined
+  community.general.redfish_command:
+    category: Systems
+    command: VerifyBiosAttributes
     baseuri: "{{ baseuri }}"
     username: "{{ username }}"
     password: "{{ password }}"
-    bios_attributes: "{{ bios_config }}"
+    bios_attributes: "{{ bios_attributes }}"
   register: result
-  ignore_errors: true
 
-- name: Saving verification result
-  set_stats:
-    data:
-      custom: "{{ result }}"
-
-- name: Success status
+- name: Status
   debug:
     msg: "{{ result }}"
-  when: not result.failed
-
-- name: Fail status
-  fail:
-    msg: "Verification is failed: {{ result }}"
-  when: result.failed

@@ -3,15 +3,6 @@ Get Boot Settings
 
 This module will get network boot settings of a given server
 
-Requirements
-------------
-
-This module requires python redfish library and ansible. You can install these packages using pip as shown below
-```
-pip3 install ansible==4.5.0 ansible-core==2.11.5
-pip3 install redfish==3.0.2
-```
-
 Role Variables
 --------------
 
@@ -48,11 +39,9 @@ Example Playbook
 ----------------
 
 ```
-- name: Get network boot settings
-  get_boot_settings:
-    baseuri: "***.***.***.***"
-    username: "abcxyz"
-    password: "******"
+- hosts: servers
+  roles:
+    - get_boot_settings
 ```
 License
 -------

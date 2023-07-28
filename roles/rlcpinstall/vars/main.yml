@@ -1,0 +1,11 @@
+---
+# Variables for the rlcpinstall role
+
+# Specify the local file path to be copied to the remote machine
+local_file_path: /path/to/local/file
+
+# Specify the remote file path where the file will be copied
+remote_file_path: /path/to/remote/file
+
+# Specify the filename of the package to install
+filename: package_name

@@ -1,6 +1,8 @@
 ---
 - name: Creating SNMP alert destinations
-  create_snmp_alert_destinations:
+  ilo_snmp:
+    category: Manager
+    command: CreateSNMPAlertDestinations
     baseuri: "{{ baseuri }}"
     username: "{{ username }}"
     password: "{{ password }}"

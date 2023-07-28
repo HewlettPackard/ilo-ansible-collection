@@ -1,0 +1,14 @@
+---
+- name: Set SPDM Settings
+  ilo_security:
+    category: Systems
+    command: SetSPDMSettings
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+    spdm_settings: "{{ spdm_settings }}"
+  register: result
+
+- name: Status
+  debug:
+    msg: "{{ result }}"

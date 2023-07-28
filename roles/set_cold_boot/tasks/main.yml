@@ -1,0 +1,13 @@
+---
+- name: Set Cold Boot
+  ilo_power:
+    category: Systems
+    command: ColdBoot
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+  register: result
+
+- name: Status
+  debug:
+    msg: "{{ result }}"

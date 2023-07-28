@@ -1,0 +1,69 @@
+---
+- hosts: myhosts
+  connection: local
+  gather_facts: False
+  tasks:
+    - name: Validate input provided by user
+      fail:
+        msg: "username/password or cert_file/key_file or auth_token is mandatory"
+      when:
+        - (username is not defined or password is not defined) and (cert_file is not defined or key_file is not defined) and (auth_token is not defined)
+
+    - name: Fail when more than one valid authentication method is provided
+      fail:
+        msg: "Only one authentication method is allowed. Provide either username/password or cert_file/key_file or auth_token."
+      when:
+        - ((username is defined or password is defined) and (cert_file is defined or key_file is defined) and auth_token is defined) or
+          ((username is defined or password is defined) and (cert_file is defined or key_file is defined)) or
+          ((username is defined or password is defined) and auth_token is defined) or
+          ((cert_file is defined or key_file is defined) and auth_token is defined)
+
+    - name: Verify logical drives when username and password are defined
+      block:
+        - ilo_storage:
+            category: Systems
+            command: VerifySpecifiedLogicalDrives
+            baseuri: "{{ baseuri }}"
+            username: "{{ username }}"
+            password: "{{ password }}"
+            raid_details: "{{ raid_details }}"
+          register: result
+
+        - name: Logical drives verification status
+          debug:
+            msg: "{{ result }}"
+
+      when: username is defined and password is defined
+
+    - name: Verify logical drives when cert_file and key_file are defined
+      block:
+        - ilo_storage:
+            category: Systems
+            command: VerifySpecifiedLogicalDrives
+            baseuri: "{{ baseuri }}"
+            cert_file: "{{ cert_file }}"
+            key_file: "{{ key_file }}"
+            raid_details: "{{ raid_details }}"
+          register: result
+
+        - name: Logical drives verification status
+          debug:
+            msg: "{{ result }}"
+
+      when: cert_file is defined and key_file is defined
+
+    - name: Verify logical drives when auth_token is defined
+      block:
+        - ilo_storage:
+            category: Systems
+            command: VerifySpecifiedLogicalDrives
+            baseuri: "{{ baseuri }}"
+            auth_token: "{{ auth_token }}"
+            raid_details: "{{ raid_details }}"
+          register: result
+
+        - name: Logical drives verification status
+          debug:
+            msg: "{{ result }}"
+
+      when: auth_token is defined

@@ -1,0 +1,13 @@
+---
+- name: Get the iLO backup file(s) details
+  ilo_manage:
+    category: Manager
+    command: GetiLOBackupFiles
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+  register: result
+
+- name: Status
+  debug:
+    msg: "{{ result }}"

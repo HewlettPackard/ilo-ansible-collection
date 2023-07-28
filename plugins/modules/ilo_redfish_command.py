@@ -53,11 +53,11 @@ options:
   force:
     required: false
     description:
-      - 
+      - forcefully upload
   tover:
     required: false
     description:
-      - 
+      - tpm override flag
   update_srs:
     required: false
     description:
@@ -65,7 +65,7 @@ options:
   componentsig:
     required: false
     description:
-      - 
+      - compsig file
   overwrite:
     required: false
     description:
@@ -76,7 +76,7 @@ author:
 
 EXAMPLES = '''
   - name: Flash Firmware package for Bios
-      community.general.ilo_redfish_command:
+    community.general.ilo_redfish_command:
         category: UpdateService
         command: Flashfwpkg
         baseuri: "15.x.x.x"
@@ -85,7 +85,7 @@ EXAMPLES = '''
         fwpkg_file: Bios_fwpkgfile.fwpkg
 
   - name: Flash Firmware package for iLO
-      community.general.ilo_redfish_command:
+    community.general.ilo_redfish_command:
         category: UpdateService
         command: Flashfwpkg
         baseuri: "15.x.x.x"
@@ -94,7 +94,7 @@ EXAMPLES = '''
         fwpkg_file: ilo_fwpkgfile.fwpkg
 
   - name: Upload Firmware package onto server
-      community.general.ilo_redfish_command:
+    community.general.ilo_redfish_command:
         category: UpdateService
         command: UploadComponent
         baseuri: "15.x.x.x"
@@ -151,15 +151,12 @@ def main():
         ],
         supports_check_mode=False
     )
-    
     category = module.params['category']
     command_list = module.params['command']
 
     creds = {"user": module.params['username'],
              "pswd": module.params['password']}
-
     options = {}
-    
     options["fwpkgfile"] = module.params['fwpkg_file']
     options["forceupload"] = module.params['force']
     options["tover"] = module.params['tover']
@@ -169,7 +166,7 @@ def main():
     options["update_target"] = module.params['update_target']
     options["update_repository"] = module.params['update_repository']
     if "UploadComponent" in command_list:
-      options["component"] = module.params['fwpkg_file']
+        options["component"] = module.params['fwpkg_file']
 
     timeout = module.params['timeout']
 
@@ -188,7 +185,7 @@ def main():
         resource = rf_utils._find_updateservice_resource()
         if not resource['ret']:
             module.fail_json(msg=to_native(resource['msg']))
-        
+
         for command in command_list:
             if command == "Flashfwpkg":
                 result = rf_utils.flash_firmware(options)

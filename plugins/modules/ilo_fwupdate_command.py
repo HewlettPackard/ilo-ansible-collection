@@ -57,7 +57,7 @@ options:
       - Value of the attribute to be configured.
     type: str
   fwpkg_file:
-    required: true
+    required: false
     description:
       - Absolute path of the firmware package file that the user wishes to attach.
   force:
@@ -75,18 +75,27 @@ options:
   componentsig:
     required: false
     description:
-      - Component signature file path needed by iLO to authenticate the component file. If not provided, the command will try to find the signature file from component file path.
+      - Component signature file path needed by iLO to authenticate the component file.
+        If not provided, the command will try to find the signature file from component file path.
   overwrite:
     required: false
     description:
       - Permission to overwrite a file present of the server with same name.
+  remote:
+    required: false
+    description:
+      - Remote file path where the file is present.
+  install_filename:
+    required: false
+    description:
+      - Name of the file package that needs to be installed.
 author:
     - "Bhavya B (@bhavya06)"
 '''
 
 EXAMPLES = '''
   - name: Flash Firmware package for Bios
-      ilo_fwupdate_command:
+    ilo_fwupdate_command:
         category: UpdateService
         command: Flashfwpkg
         baseuri: "15.x.x.x"
@@ -95,7 +104,7 @@ EXAMPLES = '''
         fwpkg_file: Bios_fwpkgfile.fwpkg
 
   - name: Flash Firmware package for iLO
-      ilo_fwupdate_command:
+    ilo_fwupdate_command:
         category: UpdateService
         command: Flashfwpkg
         baseuri: "15.x.x.x"
@@ -113,7 +122,8 @@ msg:
 '''
 
 CATEGORY_COMMANDS_ALL = {
-    "UpdateService": ["Flashfwpkg", "UploadComponent"]
+    "UpdateService": ["Flashfwpkg", "UploadComponent"],
+    "RLCP": ["PackageInstall", "SmtCmpInstall"]
 }
 
 from ansible_collections.hpe.ilo.plugins.module_utils.ilo_oem_utils import iLOOemUtils
@@ -131,7 +141,7 @@ def main():
             baseuri=dict(required=True),
             username=dict(required=True),
             password=dict(required=True, no_log=True),
-            fwpkg_file=dict(required=True),
+            fwpkg_file=dict(type='str'),
             force=dict(type='bool', default=True),
             tover=dict(type='bool', default=False),
             update_srs=dict(type='bool', default=False),
@@ -139,6 +149,8 @@ def main():
             overwrite=dict(type='bool', default=False),
             update_target=dict(type='bool', default=False),
             update_repository=dict(type='bool', default=True),
+            remote=dict(type='str'),
+            install_filename=dict(type='str'),
             timeout=dict(type='int', default=10)
         ),
         required_together=[
@@ -174,6 +186,13 @@ def main():
 
     timeout = module.params['timeout']
 
+    rpm_info = {}
+    rpm_info["OSIP"] = module.params['baseuri']
+    rpm_info["os_username"] = module.params['username']
+    rpm_info["os_password"] = module.params['password']
+    rpm_info["remote"] = module.params['remote']
+    rpm_info["file_name"] = module.params['install_filename']
+
     root_uri = "https://" + module.params['baseuri']
     rf_utils = iLOOemUtils(creds, root_uri, timeout, module)
 
@@ -186,6 +205,8 @@ def main():
 
     if category == "UpdateService":
         resource = rf_utils._find_updateservice_resource()
+        if module.params['fwpkg_file'] == '':
+            module.fail_json(msg="Fwpkg file is required.")
         if not resource['ret']:
             module.fail_json(msg=to_native(resource['msg']))
 
@@ -196,6 +217,22 @@ def main():
             if command == "UploadComponent":
                 result = rf_utils.uploadcomp(options)
                 result['changed'] = True
+
+        if result['ret'] is True:
+            if result.get('warning'):
+                module.warn(to_native(result['warning']))
+
+            module.exit_json(changed=result['changed'], msg=to_native(result))
+        else:
+            module.fail_json(msg=to_native(result['msg']))
+
+    elif category == "RLCP":
+        for command in command_list:
+            if command == "PackageInstall":
+                result = rf_utils.install_rpm(rpm_info)
+
+            if command == "SmtCmpInstall":
+                result = rf_utils.install_smartcomp(rpm_info)
 
         if result['ret'] is True:
             if result.get('warning'):

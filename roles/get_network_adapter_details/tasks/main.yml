@@ -1,0 +1,13 @@
+---
+- name: Get physical network adapter details
+  ilo_network:
+    category: Systems
+    command: GetNetworkAdapters
+    baseuri: "{{ baseuri }}"
+    username: "{{ username }}"
+    password: "{{ password }}"
+  register: network_adapter_details
+
+- name: Physical netwrok adapter details in the server
+  debug:
+    msg: "{{ network_adapter_details }}"
