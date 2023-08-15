@@ -1,0 +1,5 @@
+# the collection ilo-ansible-collection also depends on community.general being upto date.
+# Use the following command to install:
+# ansible-galaxy install -r requirements.yml
+collections:
+  - community.general
