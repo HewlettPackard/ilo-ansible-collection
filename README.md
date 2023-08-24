@@ -36,3 +36,9 @@ ansible-galaxy collection install community.general
 ```
 pip install python-ilorest-library
 ```
+```
+pip install paramiko
+```
+```
+pip install certifi
+```
