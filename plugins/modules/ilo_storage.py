@@ -272,7 +272,6 @@ CATEGORY_COMMANDS_ALL = {
     "Systems": [
         "GetPhysicalDrives",
         "GetLogicalDrives",
-        "GetLogicalDrivesWithArrayControllers",
         "GetSpecifiedLogicalDrives",
         "CreateLogicalDrives",
         "CreateLogicalDrivesWithParticularPhysicalDrives",
@@ -385,13 +384,15 @@ def main():
             if result['ret'] is False:
                 module.fail_json(msg=to_native(result['msg']))
 
+            resource = rf_utils._find_managers_resource()
+            if resource['ret'] is False:
+                module.fail_json(msg=resource['msg'])
+
             for command in command_list:
                 if command == "GetPhysicalDrives":
                     result[command] = rf_utils.get_physical_drives()
                 elif command == "GetLogicalDrives":
                     result[command] = rf_utils.get_logical_drives()
-                elif command == "GetLogicalDrivesWithArrayControllers":
-                    result[command] = rf_utils.get_logical_drives(True)
                 elif command == "GetSpecifiedLogicalDrives":
                     result[command] = rf_utils.get_specified_logical_drives(module.params["logical_drives_names"])
                 elif command == "CreateLogicalDrives":

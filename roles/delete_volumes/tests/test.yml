@@ -1,0 +1,5 @@
+---
+- hosts: myhosts
+  connection: local
+  roles:
+    - delete_volumes

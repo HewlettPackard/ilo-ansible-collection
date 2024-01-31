@@ -1,6 +1,6 @@
 galaxy_info:
   author: Gayathiri Devi Ramasamy
-  description: Updates SNMP v3 users
+  description: Updates SNMPv3 users
   company: Hewlett Packard Enterprise
 
   # If the issue tracker for your role is not on github, uncomment the

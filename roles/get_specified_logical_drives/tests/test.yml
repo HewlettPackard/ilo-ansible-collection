@@ -1,5 +1,5 @@
 ---
-- hosts: localhost
-  remote_user: root
+- hosts: myhosts
+  connection: local
   roles:
     - get_specified_logical_drives

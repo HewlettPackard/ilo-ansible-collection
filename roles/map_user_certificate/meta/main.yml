@@ -1,6 +1,6 @@
 galaxy_info:
   author: T S Kushal
-  description: Maps a User Certificate on a given server
+  description: Maps a Certificate to a specified User on a given server
   company: Hewlett Packard Enterprise
 
   # If the issue tracker for your role is not on github, uncomment the

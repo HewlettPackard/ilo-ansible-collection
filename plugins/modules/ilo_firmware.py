@@ -61,20 +61,71 @@ options:
     type: str
   file_name:
     description:
-      - Component filename when uploading it to iLO repository
+      - Component filename to be uploaded to the iLO repository
     type: str
   image_uri:
     description:
       - Webserver path where the firmware component is located.
     type: str
   install_set_attributes:
-    description:
-      - Name,description and sequence of the install set to be created
+    required: true
+    description: 
+      - Name, description and sequence of the install set to be created
     type: dict
+    suboptions:
+      install_set_name:
+        required: true
+        description: 
+          - Name of the install set
+        type: str
+      install_set_sequence:
+        required: true
+        description: 
+          - List of firmwares to be installed
+        type: list
+        suboptions:
+          Name:
+            required: true
+            description: 
+              - Name of the task
+            type: str
+          Filename:
+            required: true
+            description: 
+              - Firmware component filename present in the iLO repository
+            type: str
+          UpdatableBy:
+            description: 
+              - List of update agents
+            type: list
+            elements: str
+      Description:
+        description: 
+          - Description of the install set
+        type: str
   maintenance_window_details:
-    description:
-      - Name,description,start and end time of maintenance window to be created
+    required: true
+    description: 
+      - Name, description, start and end time of maintenance window to be created
     type: dict
+    suboptions:
+      Name:
+        required: true
+        description: 
+          - Name of the maintenance window
+        type: str
+      Description:
+        description: 
+          - Description of maintenance window
+        type: str
+      StartAfter:
+        description: 
+          - Start time of the maintenance window
+        type: str
+      Expire:
+        description: 
+          - End time of the maintenance window
+        type: str
 author:
   - Gayathiri Devi Ramasamy (@Gayathirideviramasamy)
   - T S Kushal (@TSKushal)

@@ -59,7 +59,7 @@ options:
     description:
       - absolute path to the server key file
     type: str
-  spdm_settingss:
+  spdm_settings:
     description:
       - Dictionary with value of GlobalComponentIntegrity and ComponentIntegrityPolicy parameter to be configured in the given server
     type: dict
@@ -260,6 +260,10 @@ def main():
 
         elif category == "Systems":
             result = rf_utils._find_systems_resource()
+            if result['ret'] is False:
+                module.fail_json(msg=to_native(result['msg']))
+
+            result = rf_utils._find_managers_resource()
             if result['ret'] is False:
                 module.fail_json(msg=to_native(result['msg']))
 

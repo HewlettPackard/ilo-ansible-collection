@@ -3,7 +3,7 @@
   connection: local
   gather_facts: False
   tasks:
-    - name: Validate input provided by user
+    - name: Validate server authentication input provided by user
       fail:
         msg: "username/password or cert_file/key_file or auth_token is mandatory"
       when:
@@ -29,7 +29,7 @@
             logical_drives_names: "{{ logical_drives_names }}"
           register: logical_drives_data
 
-        - name: Logical drives present in the server
+        - name: Details of the specified logical drive(s) from the server
           debug:
             msg: "{{ logical_drives_data }}"
 
@@ -46,7 +46,7 @@
             logical_drives_names: "{{ logical_drives_names }}"
           register: logical_drives_data
 
-        - name: Logical drives present in the server
+        - name: Details of the specified logical drive(s) from the server
           debug:
             msg: "{{ logical_drives_data }}"
 
@@ -62,8 +62,9 @@
             logical_drives_names: "{{ logical_drives_names }}"
           register: logical_drives_data
 
-        - name: Logical drives present in the server
+        - name: Details of the specified logical drive(s) from the server
           debug:
             msg: "{{ logical_drives_data }}"
 
       when: auth_token is defined
+  

@@ -13,26 +13,31 @@ Role Variables
       - iLO IP of the server
     type: str
   username:
-    required: true
     description:
-      - Username of the server for authentication
+      - User for authentication with iLO.
     type: str
   password:
-    required: true
     description:
-      - Password of the server for authentication
+      - Password for authentication with iLO.
+    type: str
+  auth_token:
+    description:
+      - Security token for authentication with iLO.
+    type: str
+  cert_file:
+    description:
+      - absolute path to the server cert file
+    type: str
+  key_file:
+    description:
+      - absolute path to the server key file
     type: str
   snmpv3_usernames:
+    required: true
     description:
       - List of SNMPv3 user names that need to be deleted from the given server
     type: list
     elements: str
-  http_schema:
-    required: false
-    description:
-      - 'http' or 'https' Protocol
-    default: https
-    type: str
 ```
 
 Dependencies

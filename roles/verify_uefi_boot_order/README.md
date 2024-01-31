@@ -15,28 +15,30 @@ Role Variables
     required: true
   username:
     description:
-      - Username of the server for authentication
+      - User for authentication with iLO.
     type: str
-    default: NONE
-    required: true
   password:
     description:
-      - Password of the server for authentication
+      - Password for authentication with iLO.
     type: str
-    default: NONE
-    required: true
-  http_schema:
+  auth_token:
     description:
-      - http or https Protocol
+      - Security token for authentication with iLO.
     type: str
-    default: https
-    required: false
+  cert_file:
+    description:
+      - absolute path to the server cert file
+    type: str
+  key_file:
+    description:
+      - absolute path to the server key file
+    type: str
   uefi_boot_order:
+    required: true
     description:
       - Input UEFI Boot Order
     type: list
     default: NONE
-    required: true
 ```
 
 Dependencies

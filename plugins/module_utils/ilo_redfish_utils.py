@@ -31,8 +31,6 @@ class iLORedfishUtils(RedfishUtils):
         data = response["data"]
 
         if "Oem" in data:
-            if 'Hp' in data["Oem"]:
-                data["Oem"]["Hpe"] = data["Oem"]["Hp"]
             if data["Oem"]["Hpe"]["Links"]["MySession"]["@odata.id"]:
                 current_session = data["Oem"]["Hpe"]["Links"]["MySession"]["@odata.id"]
 

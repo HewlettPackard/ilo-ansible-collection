@@ -1,7 +1,7 @@
 Map User Certificate
 =========
 
-Get the PCI device details from a given server
+Maps a Certificate to a specified User on a given server
 
 Role Variables
 --------------
@@ -15,18 +15,20 @@ Role Variables
   username:
     required: true
     description:
-      - Username of the server for authentication
+      - User for authentication with iLO.
     type: str
   password:
+    description:
+      - Password for authentication with iLO.
+    type: str
+  auth_token:
+    description:
+      - Security token for authentication with iLO.
+    type: str
+  user_cert_file:
     required: true
     description:
-      - Password of the server for authentication
-    type: str
-  http_schema:
-    required: false
-    description:
-      - 'http' or 'https' Protocol
-    default: https
+      - Absolute path of the User Certificate
     type: str
 ```
 
@@ -40,8 +42,10 @@ Example Playbook
 
 ```
 - hosts: servers
+  vars:
+    user_cert_file: "/root/user_certificate_file.crt"
   roles:
-     - get_pci_device_details
+     - map_user_certificate
 ```
 
 License

@@ -1,0 +1,47 @@
+---
+- hosts: myhosts
+  connection: local
+  gather_facts: False
+  tasks:
+    - name: Validate server authentication input provided by user
+      fail:
+        msg: "username/password or auth_token is mandatory"
+      when:
+        - (username is not defined or password is not defined) and (auth_token is not defined)
+
+    - name: Fail when more than one valid authentication method is provided
+      fail:
+        msg: "Only one authentication method is allowed. Provide either username/password or auth_token."
+      when:
+        - ((username is defined or password is defined) and auth_token is defined)
+
+    - name: Get BIOS registries when username and password are defined
+      block:
+        - community.general.redfish_info:
+            category: Systems
+            command: GetBiosRegistries
+            baseuri: "{{ baseuri }}"
+            username: "{{ username }}"
+            password: "{{ password }}"
+          register: bios_registries
+
+        - name: BIOS registries details
+          debug:
+            msg: "{{ bios_registries }}"
+
+      when: username is defined and password is defined
+
+    - name: Get BIOS registries when auth_token is defined
+      block:
+        - community.general.redfish_info:
+            category: Systems
+            command: GetBiosRegistries
+            baseuri: "{{ baseuri }}"
+            auth_token: "{{ auth_token }}"
+          register: bios_registries
+
+        - name: BIOS registries details
+          debug:
+            msg: "{{ bios_registries }}"
+
+      when: auth_token is defined

@@ -7,31 +7,27 @@ Role Variables
 --------------
 
 ```
- baseuri:
+  baseuri:
     required: true
     description:
       - iLO IP of the server
     type: str
   username:
-    required: true
     description:
-      - Username of the server for authentication
+      - User for authentication with iLO.
     type: str
   password:
-    required: true
     description:
-      - Password of the server for authentication
+      - Password for authentication with iLO.
     type: str
- bios_attributes:
+  auth_token:
+    description:
+      - Security token for authentication with iLO.
+    type: str
+  bios_attributes:
     required: true
     description: BIOS attributes to be verified
     type: dict
-  http_schema:
-    required: false
-    description:
-      - 'http' or 'https' Protocol
-    default: https
-    type: str
 ```
 
 Dependencies

@@ -1,7 +1,7 @@
 Set SPDM Settings
 =========
 
-Get the PCI device details from a given server
+Set SPDM settings on a given server
 
 Role Variables
 --------------
@@ -13,21 +13,43 @@ Role Variables
       - iLO IP of the server
     type: str
   username:
-    required: true
     description:
-      - Username of the server for authentication
+      - User for authentication with iLO.
     type: str
   password:
+    description:
+      - Password for authentication with iLO.
+    type: str
+  auth_token:
+    description:
+      - Security token for authentication with iLO.
+    type: str
+  cert_file:
+    description:
+      - absolute path to the server cert file
+    type: str
+  key_file:
+    description:
+      - absolute path to the server key file
+    type: str
+  spdm_settingss:
     required: true
     description:
-      - Password of the server for authentication
-    type: str
-  http_schema:
-    required: false
-    description:
-      - 'http' or 'https' Protocol
-    default: https
-    type: str
+      - Dictionary with values of SPDM parameters to be configured in the given server
+    type: dict
+    suboptions:
+      global_component_integrity:
+        required: true
+        description:
+          - Values of GlobalComponentIntegrity parameter to be configured on the given server.
+        type: str
+        choices: ['Enabled', 'Disabled']
+      component_integrity_policy:
+        required: true
+        description:
+          - Values of ComponentIntegrityPolicy parameter to be configured on the given server.
+        type: str
+        choices: ['NoPolicy', 'HaltBootOnSPDMFailure']
 ```
 
 Dependencies
@@ -40,6 +62,10 @@ Example Playbook
 
 ```
 - hosts: servers
+  vars:
+    spdm_settings:
+      global_component_integrity: "Enabled"
+      component_integrity_policy: "NoPolicy" 
   roles:
      - set_spdm_settings
 ```

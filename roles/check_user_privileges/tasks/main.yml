@@ -1,12 +1,22 @@
 ---
-- name: Check User Privileges
-  ilo_manage:
-    category: Systems
-    command: CheckUserPrivileges
-    baseuri: "{{ baseuri }}"
-    auth_token: "{{ auth_token }}"
-  register: user_privileges
+- name: Validate server authentication input provided by user
+  fail:
+    msg: "auth_token is mandatory"
+  when:
+    - (auth_token is not defined)
 
-- name: User Privileges
-  debug:
-    msg: "{{ user_privileges }}"
+- name: Check User Privileges when auth_token is defined
+  block:
+    - ilo_manage:
+        category: Systems
+        command: CheckUserPrivileges
+        baseuri: "{{ baseuri }}"
+        auth_token: "{{ auth_token }}"
+        required_permissions: "{{ required_permissions | default(['HostBIOSConfigPriv', 'HostNICConfigPriv', 'HostStorageConfigPriv']) }}"
+      register: result
+
+    - name: User Privileges Status
+      debug:
+        msg: "{{ result }}"
+
+  when: auth_token is defined

@@ -1,6 +1,6 @@
 galaxy_info:
   author: Nagendra M
-  description: Performs iLOn restore operation on a given server
+  description: Performs iLO restore operation on a given server
   company: Hewlett Packard Enterprise
 
   # If the issue tracker for your role is not on github, uncomment the

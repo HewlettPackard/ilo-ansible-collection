@@ -1,0 +1,47 @@
+---
+- name: Validate server authentication input provided by user
+  fail:
+    msg: "username/password or auth_token is mandatory"
+  when:
+    - (username is not defined or password is not defined) and (auth_token is not defined)
+
+- name: Fail when more than one valid authentication method is provided
+  fail:
+    msg: "Only one authentication method is allowed. Provide either username/password or auth_token."
+  when:
+    - ((username is defined or password is defined) and auth_token is defined)
+
+- name: Create volumes when username and password are defined
+  block:
+    - community.general.redfish_config:
+        category: Systems
+        command: CreateVolume
+        baseuri: "{{ baseuri }}"
+        username: "{{ username }}"
+        password: "{{ password }}"
+        storage_subsystem_id: "{{ storage_subsystem_id }}"
+        volume_details: "{{ volume_details }}"
+      register: result
+
+    - name: Status
+      debug:
+        msg: "{{ result }}"
+
+  when: username is defined and password is defined
+
+- name: Create volumes when auth_token is defined
+  block:
+    - community.general.redfish_config:
+        category: Systems
+        command: CreateVolume
+        baseuri: "{{ baseuri }}"
+        auth_token: "{{ auth_token }}"
+        storage_subsystem_id: "{{ storage_subsystem_id }}"
+        volume_details: "{{ volume_details }}"
+      register: result
+
+    - name: Status
+      debug:
+        msg: "{{ result }}"
+     
+  when: auth_token is defined

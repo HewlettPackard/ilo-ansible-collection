@@ -1,5 +1,5 @@
 ---
-- hosts: localhost
-  remote_user: root
+- hosts: myhosts
+  connection: local
   roles:
     - update_firmware_through_install_set

@@ -71,7 +71,7 @@ EXAMPLES = """
   - name: Set Cold Boot
     ilo_power:
       category: Systems
-      command: ColdBoot
+      command: SetColdBoot
       baseuri: "{{ baseuri }}"
       username: "{{ username }}"
       password: "{{ password }}"
@@ -103,9 +103,9 @@ ilo_power:
     returned: always
 """
 
-CATEGORY_COMMANDS_ALL = {"Systems": ["ColdBoot", "GetServerPostState"]}
+CATEGORY_COMMANDS_ALL = {"Systems": ["SetColdBoot", "GetServerPostState"]}
 
-CATEGORY_COMMANDS_DEFAULT = {"Systems": "ColdBoot"}
+CATEGORY_COMMANDS_DEFAULT = {"Systems": "GetServerPostState"}
 
 HAS_OEM_REDFISH = True
 
@@ -202,7 +202,7 @@ def main():
                 module.fail_json(msg=to_native(result['msg']))
 
             for command in command_list:
-                if command == "ColdBoot":
+                if command == "SetColdBoot":
                     result[command] = rf_utils.set_cold_boot()
                 elif command == "GetServerPostState":
                     result[command] = rf_utils.get_server_poststate()

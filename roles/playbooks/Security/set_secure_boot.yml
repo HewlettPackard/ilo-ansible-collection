@@ -1,0 +1,49 @@
+---
+- hosts: myhosts
+  connection: local
+  gather_facts: False
+  tasks:
+    - name: Validate server authentication input provided by user
+      fail:
+        msg: "username/password or auth_token is mandatory"
+      when:
+        - (username is not defined or password is not defined) and (auth_token is not defined)
+
+    - name: Fail when more than one valid authentication method is provided
+      fail:
+        msg: "Only one authentication method is allowed. Provide either username/password or auth_token."
+      when:
+        - ((username is defined or password is defined) and auth_token is defined)
+
+    - name: Set secure boot when username and password are defined
+      block:
+        - community.general.redfish_config:
+            category: Systems
+            command: SetSecureBoot
+            baseuri: "{{ baseuri }}"
+            username: "{{ username }}"
+            password: "{{ password }}"
+            secure_boot_enable: "{{ secure_boot_enable }}"
+          register: result
+
+        - name: Status
+          debug:
+            msg: "{{ result }}"
+
+      when: username is defined and password is defined
+
+    - name: Set secure boot when auth_token is defined
+      block:
+        - community.general.redfish_config:
+            category: Systems
+            command: SetSecureBoot
+            baseuri: "{{ baseuri }}"
+            auth_token: "{{ auth_token }}"
+            secure_boot_enable: "{{ secure_boot_enable }}"
+          register: result
+
+        - name: Status
+          debug:
+            msg: "{{ result }}"
+
+      when: auth_token is defined

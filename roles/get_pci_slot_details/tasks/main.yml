@@ -1,13 +1,62 @@
 ---
-- name: Get PCI slot details
-  ilo_network:
-    category: Systems
-    command: GetPCISlots
-    baseuri: "{{ baseuri }}"
-    username: "{{ username }}"
-    password: "{{ password }}"
-  register: pci_slot_details
+- name: Validate server authentication input provided by user
+  fail:
+    msg: "username/password or cert_file/key_file or auth_token is mandatory"
+  when:
+    - (username is not defined or password is not defined) and (cert_file is not defined or key_file is not defined) and (auth_token is not defined)
 
-- name: PCI slot details in the server
-  debug:
-    msg: "{{ pci_slot_details }}"
+- name: Fail when more than one valid authentication method is provided
+  fail:
+    msg: "Only one authentication method is allowed. Provide either username/password or cert_file/key_file or auth_token."
+  when:
+    - ((username is defined or password is defined) and (cert_file is defined or key_file is defined) and auth_token is defined) or
+      ((username is defined or password is defined) and (cert_file is defined or key_file is defined)) or
+      ((username is defined or password is defined) and auth_token is defined) or
+      ((cert_file is defined or key_file is defined) and auth_token is defined)
+
+- name: Get PCI slot details when username and password are defined
+  block:
+    - ilo_network:
+        category: Systems
+        command: GetPCISlots
+        baseuri: "{{ baseuri }}"
+        username: "{{ username }}"
+        password: "{{ password }}"
+      register: pci_slot_details
+
+    - name: PCI slot details in the server
+      debug:
+        msg: "{{ pci_slot_details }}"
+
+  when: username is defined and password is defined
+
+- name: Get PCI slot details when cert_file and key_file are defined
+  block:
+    - ilo_network:
+        category: Systems
+        command: GetPCISlots
+        baseuri: "{{ baseuri }}"
+        cert_file: "{{ cert_file }}"
+        key_file: "{{ key_file }}"
+      register: pci_slot_details
+
+    - name: PCI slot details present in the server
+      debug:
+        msg: "{{ pci_slot_details }}"
+
+  when: cert_file is defined and key_file is defined
+
+- name: Get PCI slot details when auth_token is defined
+  block:
+    - ilo_network:
+        category: Systems
+        command: GetPCISlots
+        baseuri: "{{ baseuri }}"
+        auth_token: "{{ auth_token }}"
+      register: pci_slot_details
+
+    - name: PCI slot details in the server
+      debug:
+        msg: "{{ pci_slot_details }}"
+
+  when: auth_token is defined

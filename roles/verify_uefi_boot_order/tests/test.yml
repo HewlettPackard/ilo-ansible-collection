@@ -1,6 +1,6 @@
 ---
-- hosts: localhost
-  remote_user: root
+- hosts: myhosts
+  connection: local
   roles:
     - verify_uefi_boot_order
     

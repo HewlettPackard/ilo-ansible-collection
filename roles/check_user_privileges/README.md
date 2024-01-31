@@ -12,22 +12,18 @@ Role Variables
     description:
       - iLO IP address of the server
     type: str
-  username:
+  auth_token:
     required: true
     description:
-      - Username of the server for authentication
+      - Security token for authentication with iLO.
     type: str
-  password:
+  required_permissions:
     required: true
     description:
-      - Password of the server for authentication
-    type: str
-  http_schema:
-    required: false
-    description:
-      - 'http' or 'https' Protocol
-    default: https
-    type: str
+      - permissions to be checked against provided user
+    type: list
+    elements: str
+    default: ['HostBIOSConfigPriv', 'HostNICConfigPriv', 'HostStorageConfigPriv']
 ```
 
 Dependencies
@@ -40,6 +36,8 @@ Example Playbook
 
 ```
 - hosts: servers
+  vars:
+    required_permissions: ['HostBIOSConfigPriv']
   roles:
     - check_user_privileges
 ```

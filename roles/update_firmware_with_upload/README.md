@@ -13,22 +13,34 @@ Role Variables
       - iLO IP of the server
     type: str
   username:
-    required: true
     description:
-      - Username of the server for authentication
+      - User for authentication with iLO.
     type: str
   password:
-    required: true
     description:
-      - Password of the server for authentication
+      - Password for authentication with iLO.
+    type: str
+  auth_token:
+    description:
+      - Security token for authentication with iLO.
+    type: str
+  cert_file:
+    description:
+      - absolute path to the server cert file
+    type: str
+  key_file:
+    description:
+      - absolute path to the server key file
     type: str
   file_name:
+    required: true
     description: 
-      - Component filename when uploading it to iLO repository
+      - Component filename to be uploaded to the iLO repository
     type: str
   image_uri:
+    required: true
     description:
-      - Webserver path where the firmware component is located.
+      - Webserver path where the firmware component is located
     type: str
 ```
 
@@ -43,8 +55,8 @@ Example Playbook
 ```
 - hosts: servers
   vars:
-    image_uri: "{{ image_url }}"
-    file_name: "{{ file_name }}"
+    image_uri: "http//10.xxx.xxx.xxx/ilo5_70.fwpkg"
+    file_name: "ilo6_70.fwpkg"
   roles:
      - update_firmware_with_upload
 ```

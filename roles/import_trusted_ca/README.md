@@ -13,25 +13,21 @@ Role Variables
       - iLO IP of the server
     type: str
   username:
-    required: true
     description:
-      - Username of the server for authentication
+      - User for authentication with iLO.
     type: str
   password:
-    required: true
     description:
-      - Password of the server for authentication
+      - Password for authentication with iLO.
+    type: str
+  auth_token:
+    description:
+      - Security token for authentication with iLO.
     type: str
   ca_file:
     required: true
     description:
       - Absolute path of the CA Certificate
-    type: str
-  http_schema:
-    required: false
-    description:
-      - 'http' or 'https' Protocol
-    default: https
     type: str
 ```
 
@@ -45,6 +41,8 @@ Example Playbook
 
 ```
 - hosts: servers
+  vars:
+    ca_file: "/root/ca_file.crt"
   roles:
      - import_trusted_ca
 ```

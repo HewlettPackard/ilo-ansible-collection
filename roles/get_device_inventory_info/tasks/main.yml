@@ -1,13 +1,62 @@
 ---
-- name: Get Device Inventory Information
-  ilo_device:
-    category: Chassis
-    command: GetDeviceInventoryInfo
-    baseuri: "{{ baseuri }}"
-    username: "{{ username }}"
-    password: "{{ password }}"
-  register: device_inventory_info
+- name: Validate server authentication input provided by user
+  fail:
+    msg: "username/password or cert_file/key_file or auth_token is mandatory"
+  when:
+    - (username is not defined or password is not defined) and (cert_file is not defined or key_file is not defined) and (auth_token is not defined)
 
-- name: Device Inventory Information in the server
-  debug:
-    msg: "{{ device_inventory_info }}"
+- name: Fail when more than one valid authentication method is provided
+  fail:
+    msg: "Only one authentication method is allowed. Provide either username/password or cert_file/key_file or auth_token."
+  when:
+    - ((username is defined or password is defined) and (cert_file is defined or key_file is defined) and auth_token is defined) or
+      ((username is defined or password is defined) and (cert_file is defined or key_file is defined)) or
+      ((username is defined or password is defined) and auth_token is defined) or
+      ((cert_file is defined or key_file is defined) and auth_token is defined)
+
+- name: Get Device Inventory Information when username and password are defined
+  block:
+    - ilo_device:
+        category: Chassis
+        command: GetDeviceInventoryInfo
+        baseuri: "{{ baseuri }}"
+        username: "{{ username }}"
+        password: "{{ password }}"
+      register: result
+
+    - name: Device Inventory Information
+      debug:
+        msg: "{{ result }}"
+
+  when: username is defined and password is defined
+
+- name: Get Device Inventory Information when cert_file and key_file are defined
+  block:
+    - ilo_device:
+        category: Chassis
+        command: GetDeviceInventoryInfo
+        baseuri: "{{ baseuri }}"
+        cert_file: "{{ cert_file }}"
+        key_file: "{{ key_file }}"
+      register: result
+
+    - name: Device Inventory Information
+      debug:
+        msg: "{{ result }}"
+        
+  when: cert_file is defined and key_file is defined
+
+- name: Get Device Inventory Information when auth_token is defined
+  block:
+    - ilo_device:
+        category: Chassis
+        command: GetDeviceInventoryInfo
+        baseuri: "{{ baseuri }}"
+        auth_token: "{{ auth_token }}"
+      register: result
+
+    - name: Device Inventory Information
+      debug:
+        msg: "{{ result }}"
+     
+  when: auth_token is defined

@@ -59,6 +59,12 @@ options:
     description:
       - absolute path to the server key file
     type: str
+  required_permissions:
+    description:
+      - permissions to be checked against provided user
+    type: list
+    elements: str
+    default: ["HostBIOSConfigPriv", "HostNICConfigPriv", "HostStorageConfigPriv"]
 author:
   - Gayathiri Devi Ramasamy (@Gayathirideviramasamy)
   - T S Kushal (@TSKushal)
@@ -182,7 +188,8 @@ def main():
             auth_token=dict(no_log=True),
             timeout=dict(type="int", default=60),
             cert_file=dict(type="str"),
-            key_file=dict(type="str")
+            key_file=dict(type="str"),
+            required_permissions=dict(required=False, type="list", elements='str', deafult=["HostBIOSConfigPriv", "HostNICConfigPriv", "HostStorageConfigPriv"])
         ),
         required_together=[
             ("username", "password"),
@@ -214,6 +221,9 @@ def main():
         creds["token"] = ilo_certificate_login(root_uri, module, module.params["cert_file"], module.params["key_file"])
 
     rf_utils = iLOOemUtils(creds, root_uri, timeout, module)
+
+    # Set required permissions to be checked on the server
+    required_permissions = module.params["required_permissions"]
 
     # Build Category list
     if "all" in module.params["category"]:
@@ -255,7 +265,7 @@ def main():
                 if command == "WaitforiLORebootCompletion":
                     result[command] = rf_utils.wait_for_ilo_reboot_completion()
                 elif command == "CheckUserPrivileges":
-                    result[command] = rf_utils.check_user_privileges()
+                    result[command] = rf_utils.check_user_privileges(module.params["baseuri"], required_permissions)
 
         elif category == "Manager":
             result = rf_utils._find_managers_resource()
