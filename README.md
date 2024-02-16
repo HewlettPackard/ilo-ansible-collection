@@ -42,3 +42,27 @@ pip install paramiko
 ```
 pip install certifi
 ```
+
+## License
+
+This project is licensed under the Apache 2.0 license. Please see the [LICENSE](LICENSE) for more information.
+
+## Contributing and feature requests
+
+**Contributing:** We welcome your contributions to the Ansible Modules for HPE OneView. See [CONTRIBUTING.md](CONTRIBUTING.md) for more details.
+
+**Feature Requests:** If you have a need that is not met by the current implementation, please let us know (via a new issue).
+This feedback is crucial for us to deliver a useful product. Do not assume that we have already thought of everything, because we assure you that is not the case.
+
+## Features
+
+The HPE.Oneview collection includes
+[roles](https://github.com/HewlettPackard/ilo-ansible-collection/tree/master/roles/),
+[modules](https://github.com/HewlettPackard/ilo-ansible-collection/tree/master/plugins/modules),
+[sample playbooks](https://github.com/HewlettPackard/ilo-ansible-collection/tree/master/playbooks),
+[module_utils](https://github.com/HewlettPackard/ilo-ansible-collection/tree/master/plugins/module_utils)
+
+
+## Copyright
+
+© Copyright 2022-24 Hewlett Packard Enterprise Development LP
