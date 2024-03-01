@@ -118,20 +118,26 @@ class UnsuccesfulRequest(FwpkgError):
 
     pass
 
+
 def ilo_certificate_login(root_uri, module, cert_file, key_file):
     if not os.path.exists(cert_file):
-        module.fail_json(msg="The client cert file does not exist in the provided path %s" % str(cert_file))
+        module.fail_json(
+            msg="The client cert file does not exist in the provided path %s" % str(cert_file))
 
     if not os.path.exists(key_file):
-        module.fail_json(msg="The client key file does not exist in the provided path %s" % str(key_file))
+        module.fail_json(
+            msg="The client key file does not exist in the provided path %s" % str(key_file))
 
     try:
-        http = urllib3.PoolManager(cert_reqs='CERT_NONE', cert_file=cert_file, key_file=key_file)
+        http = urllib3.PoolManager(
+            cert_reqs='CERT_NONE', cert_file=cert_file, key_file=key_file)
         cert_login = http.request('GET', root_uri + "/html/login_cert.html")
     except Exception as e:
-        module.fail_json(msg="Server login with certificates failed: %s" % str(e))
+        module.fail_json(
+            msg="Server login with certificates failed: %s" % str(e))
 
     return cert_login.getheader('X-Auth-Token')
+
 
 class iLOOemUtils(RedfishUtils):
 
@@ -139,10 +145,12 @@ class iLOOemUtils(RedfishUtils):
         super().__init__(creds, root_uri, timeout, module)
 
         if not HAS_IPADDRESS:
-            self.module.fail_json(msg=missing_required_lib('ipaddress'), exception=IPADDRESS_IMP_ERR)
+            self.module.fail_json(msg=missing_required_lib(
+                'ipaddress'), exception=IPADDRESS_IMP_ERR)
 
         if not HAS_URLLIB3:
-            self.module.fail_json(msg=missing_required_lib('urllib3'), exception=URLLIB3_IMP_ERR)
+            self.module.fail_json(msg=missing_required_lib(
+                'urllib3'), exception=URLLIB3_IMP_ERR)
 
         if not HAS_REDFISH:
             self.module.warn(f"missing redfish library")
@@ -151,16 +159,16 @@ class iLOOemUtils(RedfishUtils):
             self.module.warn(f"missing paramiko library")
 
     def get_ilo_generation(self):
-        #Get the firmware version
+        # Get the firmware version
         response = self.get_request(self.root_uri + self.manager_uri)
         if response['ret'] is False:
             return response
         resp = response['data']
         if 'FirmwareVersion' not in resp.keys():
             return {
-                    "ret": False,
-                    "msg": "Key 'FirmwareVersion' not found in response: %s" % (resp)
-                }
+                "ret": False,
+                "msg": "Key 'FirmwareVersion' not found in response: %s" % (resp)
+            }
         fw_version = resp['FirmwareVersion']
         ilo_gen = re.sub("\D", "", fw_version).strip()[0]
         return {
@@ -503,7 +511,8 @@ class iLOOemUtils(RedfishUtils):
             pwd = self.creds['pswd']
             baseurl = self.root_uri
 
-            redfish_obj = redfish.RedfishClient(base_url=baseurl, username=user, password=pwd)
+            redfish_obj = redfish.RedfishClient(
+                base_url=baseurl, username=user, password=pwd)
             redfish_obj.login()
             session_key = redfish_obj.session_key
 
@@ -515,7 +524,8 @@ class iLOOemUtils(RedfishUtils):
                 "UpdateRecoverySet": options["update_srs"],
             }
 
-            data = [("sessionKey", session_key), ("parameters", json.dumps(parameters))]
+            data = [("sessionKey", session_key),
+                    ("parameters", json.dumps(parameters))]
 
             if not compsigpath:
                 compsigpath = self.findcompsig(componentpath)
@@ -541,11 +551,13 @@ class iLOOemUtils(RedfishUtils):
                 ("file", (ilo_upload_filename, output, "application/octet-stream"))
             )
 
-            headers = {'Cookie': 'sessionKey=' + session_key, 'X-Auth-Token': session_key, 'OData-Version': '4.0'}
+            headers = {'Cookie': 'sessionKey=' + session_key,
+                       'X-Auth-Token': session_key, 'OData-Version': '4.0'}
 
             args = None
 
-            results = redfish_obj.post(str(urltosend), data, args=args, headers=headers)
+            results = redfish_obj.post(
+                str(urltosend), data, args=args, headers=headers)
 
             if results.status == 200:
                 ret["ret"] = True
@@ -731,16 +743,16 @@ class iLOOemUtils(RedfishUtils):
     def get_physical_drives(self):
         # This method returns list of physical drives present in the OOB controller
 
-        #Check the iLO version
+        # Check the iLO version
         response = self.get_ilo_generation()
         if response['ret'] is False:
             return response
 
         if response["ilo_gen"] >= 6:
             return {
-                    "ret": False,
-                    "msg": "This operation is not supported for iLO %s servers" % (str(response["ilo_gen"]))
-                }
+                "ret": False,
+                "msg": "This operation is not supported for iLO %s servers" % (str(response["ilo_gen"]))
+            }
 
         physical_drives = {}
         physical_drives_count = 0
@@ -750,7 +762,8 @@ class iLOOemUtils(RedfishUtils):
         if not response["ret"]:
             return response
 
-        response = self.get_request(self.root_uri + self.systems_uri + "SmartStorage/ArrayControllers/")
+        response = self.get_request(
+            self.root_uri + self.systems_uri + "SmartStorage/ArrayControllers/")
 
         if not response["ret"]:
             return response
@@ -807,8 +820,10 @@ class iLOOemUtils(RedfishUtils):
 
                 log_data = self.remove_odata(response["data"])
                 physical_drive_list.append(log_data)
-            physical_drives.update({"array_controller_" + str(array_url.split("/")[-2]): physical_drive_list})
-            physical_drives_count = physical_drives_count + len(physical_drive_list)
+            physical_drives.update(
+                {"array_controller_" + str(array_url.split("/")[-2]): physical_drive_list})
+            physical_drives_count = physical_drives_count + \
+                len(physical_drive_list)
             result["physical_drives"] = physical_drives
             result["physical_drives_count"] = physical_drives_count
 
@@ -821,16 +836,16 @@ class iLOOemUtils(RedfishUtils):
     def get_logical_drives(self):
         # This method returns the logical drives details
 
-        #Check the iLO version
+        # Check the iLO version
         response = self.get_ilo_generation()
         if response['ret'] is False:
             return response
 
         if response["ilo_gen"] >= 6:
             return {
-                    "ret": False,
-                    "msg": "This operation is not supported for iLO %s servers" % (str(response["ilo_gen"]))
-                }
+                "ret": False,
+                "msg": "This operation is not supported for iLO %s servers" % (str(response["ilo_gen"]))
+            }
 
         logical_drives_details = []
         logical_drives = {}
@@ -881,7 +896,8 @@ class iLOOemUtils(RedfishUtils):
                 }
 
             response = self.get_request(
-                self.root_uri + log_details["Links"]["LogicalDrives"]["@odata.id"]
+                self.root_uri +
+                log_details["Links"]["LogicalDrives"]["@odata.id"]
             )
             if not response["ret"]:
                 return response
@@ -907,7 +923,8 @@ class iLOOemUtils(RedfishUtils):
 
                 member_data["data_drives"] = []
                 response = self.get_request(
-                    self.root_uri + member_data["Links"]["DataDrives"]["@odata.id"]
+                    self.root_uri +
+                    member_data["Links"]["DataDrives"]["@odata.id"]
                 )
                 if not response["ret"]:
                     return response
@@ -920,12 +937,16 @@ class iLOOemUtils(RedfishUtils):
                     )
                     if not response["ret"]:
                         return response
-                    data_drive_member_details = self.remove_odata(response["data"])
-                    member_data["data_drives"].append(data_drive_member_details)
+                    data_drive_member_details = self.remove_odata(
+                        response["data"])
+                    member_data["data_drives"].append(
+                        data_drive_member_details)
                 logical_drives_details.append(member_data)
 
-            logical_drives.update({"array_controller_" + str(array_url.split("/")[-2]): logical_drives_details})
-            logical_drives_count = logical_drives_count + len(logical_drives_details)
+            logical_drives.update(
+                {"array_controller_" + str(array_url.split("/")[-2]): logical_drives_details})
+            logical_drives_count = logical_drives_count + \
+                len(logical_drives_details)
             result["logical_drives"] = logical_drives
             result["logical_drives_count"] = logical_drives_count
 
@@ -936,7 +957,8 @@ class iLOOemUtils(RedfishUtils):
 
     def remove_odata(self, output):
         # Remove odata variables given in the list
-        remove_list = ["@odata.context", "@odata.etag", "@odata.id", "@odata.type"]
+        remove_list = ["@odata.context",
+                       "@odata.etag", "@odata.id", "@odata.type"]
         for key in remove_list:
             if key in output:
                 output.pop(key)
@@ -954,7 +976,8 @@ class iLOOemUtils(RedfishUtils):
                 "ret": False,
                 "changed": False,
                 "msg": "Logical drive count present under raid_details in the input (%s) is not matching with "
-                        "logical drive count present in the server (%s)" % (str(len(raid_details)), str(logical_drives_count))
+                "logical drive count present in the server (%s)" % (
+                    str(len(raid_details)), str(logical_drives_count))
             }
         return {
             "ret": True,
@@ -964,19 +987,20 @@ class iLOOemUtils(RedfishUtils):
     def verify_logical_drives(self, raid_details, check_length=False):
         # This method verifies logical drives present in the OOB controller against the provided input
 
-        #Check the iLO version
+        # Check the iLO version
         response = self.get_ilo_generation()
         if response['ret'] is False:
             return response
 
         if response["ilo_gen"] >= 6:
             return {
-                    "ret": False,
-                    "msg": "This operation is not supported for iLO %s servers" % (str(response["ilo_gen"]))
-                }
+                "ret": False,
+                "msg": "This operation is not supported for iLO %s servers" % (str(response["ilo_gen"]))
+            }
 
         # verify input parameters
-        response = self.verify_input_paramters(raid_details, "VerifyLogicalDrives")
+        response = self.verify_input_paramters(
+            raid_details, "VerifyLogicalDrives")
         if not response["ret"]:
             return response
 
@@ -987,7 +1011,8 @@ class iLOOemUtils(RedfishUtils):
         logical_drives = result["msg"]["logical_drives"]
         logical_drives_count = result["msg"]["logical_drives_count"]
         if check_length:
-            response = self.verify_drive_count(raid_details, logical_drives_count)
+            response = self.verify_drive_count(
+                raid_details, logical_drives_count)
             if not response["ret"]:
                 return response
 
@@ -996,7 +1021,8 @@ class iLOOemUtils(RedfishUtils):
             flag = False
             for key, value in logical_drives.items():
                 for drive in value:
-                    fail_message = "Verification Failed for %s. " % str(drive["LogicalDriveName"])
+                    fail_message = "Verification Failed for %s. " % str(
+                        drive["LogicalDriveName"])
                     fail = False
                     if drive["LogicalDriveName"] == raid["LogicalDriveName"]:
                         if ("Raid" + drive["Raid"]) != raid["Raid"]:
@@ -1048,10 +1074,10 @@ class iLOOemUtils(RedfishUtils):
 
         if not input_boot_order or len(input_boot_order) == 0:
             return {
-                        "ret": False,
-                        "changed": False,
-                        "msg": "The provided input Boot Order is empty. Hence Boot Order can't be verified"
-                    }            
+                "ret": False,
+                "changed": False,
+                "msg": "The provided input Boot Order is empty. Hence Boot Order can't be verified"
+            }
 
         # response = self.get_bios_attributes()
         response = self.get_multi_bios_attributes()
@@ -1099,16 +1125,16 @@ class iLOOemUtils(RedfishUtils):
     def delete_all_logical_drives(self):
         # This function deletes all the logical drives
 
-        #Check the iLO version
+        # Check the iLO version
         response = self.get_ilo_generation()
         if response['ret'] is False:
             return response
 
         if response["ilo_gen"] >= 6:
             return {
-                    "ret": False,
-                    "msg": "This operation is not supported for iLO %s servers" % (str(response["ilo_gen"]))
-                }
+                "ret": False,
+                "msg": "This operation is not supported for iLO %s servers" % (str(response["ilo_gen"]))
+            }
 
         response = self.get_request(self.root_uri + self.systems_uri)
         if not response["ret"]:
@@ -1127,7 +1153,8 @@ class iLOOemUtils(RedfishUtils):
 
         payload = {"LogicalDrives": [], "DataGuard": "Disabled"}
 
-        smartstorageconfig_settings_uri = self.root_uri + self.systems_uri + "smartstorageconfig/settings/"
+        smartstorageconfig_settings_uri = self.root_uri + \
+            self.systems_uri + "smartstorageconfig/settings/"
         response = self.put_request(smartstorageconfig_settings_uri, payload)
 
         if not response["ret"]:
@@ -1148,7 +1175,8 @@ class iLOOemUtils(RedfishUtils):
         if not response["ret"]:
             return response
 
-        response = self.get_request(self.root_uri + self.systems_uri + "SmartStorage/")
+        response = self.get_request(
+            self.root_uri + self.systems_uri + "SmartStorage/")
         if not response["ret"]:
             return response
 
@@ -1163,7 +1191,8 @@ class iLOOemUtils(RedfishUtils):
                 "msg": "Array Controllers data not found in %s response: %s" % (uri, str(json_data))
             }
 
-        response = self.get_request(self.root_uri + json_data["Links"]["ArrayControllers"]["@odata.id"])
+        response = self.get_request(
+            self.root_uri + json_data["Links"]["ArrayControllers"]["@odata.id"])
 
         if not response["ret"]:
             return response
@@ -1178,7 +1207,8 @@ class iLOOemUtils(RedfishUtils):
 
             log_details = log["data"]
 
-            response = self.get_request(self.root_uri + log_details["Links"]["UnconfiguredDrives"]["@odata.id"])
+            response = self.get_request(
+                self.root_uri + log_details["Links"]["UnconfiguredDrives"]["@odata.id"])
             if not response["ret"]:
                 return response
 
@@ -1239,11 +1269,11 @@ class iLOOemUtils(RedfishUtils):
             input_list = ['LogicalDriveName', 'Raid', 'DataDrives']
             drive_input = ['DataDriveCount', 'DataDriveMediaType',
                            'DataDriveInterfaceType', 'DataDriveMinimumSizeGiB']
-            
+
             missing_param = []
             not_defined = []
 
-            for raid in raid_data:    
+            for raid in raid_data:
                 for input in input_list:
                     if input not in raid.keys():
                         missing_param.append(input)
@@ -1266,12 +1296,13 @@ class iLOOemUtils(RedfishUtils):
             return self.validation_error(raid, input_list, missing_param, not_defined, drive_input)
 
         elif command == "CreateLogicalDrivesWithParticularPhysicalDrives":
-            input_list = ['LogicalDriveName', 'CapacityGB', 'Raid', 'DataDrives']
+            input_list = ['LogicalDriveName',
+                          'CapacityGB', 'Raid', 'DataDrives']
 
             missing_param = []
             not_defined = []
-            
-            for raid in raid_data:    
+
+            for raid in raid_data:
                 for input in input_list:
                     if input not in raid.keys():
                         missing_param.append(input)
@@ -1284,8 +1315,10 @@ class iLOOemUtils(RedfishUtils):
         # Checking and verifying physical drives present in the OOB controller for the
         # CreateLogicalDrives and CreateLogicalDrivesWithPArticularPhysicalDrives modules
         if command == "CreateLogicalDrives":
-            raid_data = sorted(raid_data, key=lambda i: i['DataDrives']['DataDriveMinimumSizeGiB'])
-            unused_physical_drives = sorted(unused_physical_drives, key=lambda i: i['CapacityGB'])
+            raid_data = sorted(
+                raid_data, key=lambda i: i['DataDrives']['DataDriveMinimumSizeGiB'])
+            unused_physical_drives = sorted(
+                unused_physical_drives, key=lambda i: i['CapacityGB'])
             for raid in raid_data:
                 for i in range(0, int(raid["DataDrives"]["DataDriveCount"])):
                     flag = False
@@ -1421,7 +1454,8 @@ class iLOOemUtils(RedfishUtils):
         if command == "CreateLogicalDrives":
             needed_phy = 0
             for ld in raid_data:
-                needed_phy = needed_phy + int(ld["DataDrives"]["DataDriveCount"])
+                needed_phy = needed_phy + \
+                    int(ld["DataDrives"]["DataDriveCount"])
 
             # Check available drives
             if not unused_physical_drives:
@@ -1445,7 +1479,8 @@ class iLOOemUtils(RedfishUtils):
             }
 
         elif command == "CreateLogicalDrivesWithParticularPhysicalDrives":
-            needed_phy_drives = [drive for ld in raid_data for drive in ld["DataDrives"]]
+            needed_phy_drives = [
+                drive for ld in raid_data for drive in ld["DataDrives"]]
             needed_phy = len(needed_phy_drives)
 
             # Check available drives
@@ -1507,16 +1542,16 @@ class iLOOemUtils(RedfishUtils):
     def create_logical_drives(self, raid_data):
         # This function invokes the creation of logical drive.
 
-        #Check the iLO version
+        # Check the iLO version
         response = self.get_ilo_generation()
         if response['ret'] is False:
             return response
 
         if response["ilo_gen"] >= 6:
             return {
-                    "ret": False,
-                    "msg": "This operation is not supported for iLO %s servers" % (str(response["ilo_gen"]))
-                }
+                "ret": False,
+                "msg": "This operation is not supported for iLO %s servers" % (str(response["ilo_gen"]))
+            }
 
         # verify input parameters
         response = self.verify_input_paramters(raid_data)
@@ -1538,7 +1573,8 @@ class iLOOemUtils(RedfishUtils):
         if logical_drives_details:
             raid_details = raid_data[:]
             for raid in raid_details:
-                response = self.check_logical_drives(raid, logical_drives_details)
+                response = self.check_logical_drives(
+                    raid, logical_drives_details)
                 if response["ret"]:
                     raid_data.remove(raid)
                 elif not response["ret"] and response["msg"] != "Logical drive provided is not present in server":
@@ -1551,11 +1587,13 @@ class iLOOemUtils(RedfishUtils):
                 "msg": "Provided logical drives are already present in the server"
             }
 
-        response = self.check_physical_drive_count(raid_data, unused_physical_drives)
+        response = self.check_physical_drive_count(
+            raid_data, unused_physical_drives)
         if not response["ret"]:
             return response
 
-        response = self.check_physical_drives(raid_data, unused_physical_drives)
+        response = self.check_physical_drives(
+            raid_data, unused_physical_drives)
         if not response["ret"]:
             return response
 
@@ -1563,7 +1601,8 @@ class iLOOemUtils(RedfishUtils):
         if not response["ret"]:
             return response
 
-        response = self.get_request(self.root_uri + self.systems_uri + "smartstorageconfig/")
+        response = self.get_request(
+            self.root_uri + self.systems_uri + "smartstorageconfig/")
         if not response["ret"]:
             return response
 
@@ -1571,7 +1610,8 @@ class iLOOemUtils(RedfishUtils):
 
         ld_names = [i["LogicalDriveName"] for i in raid_data]
         LogicalDrives = storage_data["LogicalDrives"]
-        body = {"LogicalDrives": LogicalDrives + raid_data, "DataGuard": "Permissive"}
+        body = {"LogicalDrives": LogicalDrives +
+                raid_data, "DataGuard": "Permissive"}
         url = "smartstorageconfig/settings/"
         res = self.put_request(self.root_uri + self.systems_uri + url, body)
 
@@ -1587,19 +1627,20 @@ class iLOOemUtils(RedfishUtils):
     def create_logical_drives_with_particular_physical_drives(self, raid_data):
         # This function invokes the creation of logical drive with paticular physical drives
 
-        #Check the iLO version
+        # Check the iLO version
         response = self.get_ilo_generation()
         if response['ret'] is False:
             return response
 
         if response["ilo_gen"] >= 6:
             return {
-                    "ret": False,
-                    "msg": "This operation is not supported for iLO %s servers" % (str(response["ilo_gen"]))
-                }
+                "ret": False,
+                "msg": "This operation is not supported for iLO %s servers" % (str(response["ilo_gen"]))
+            }
 
         # verify input parameters
-        response = self.verify_input_paramters(raid_data, "CreateLogicalDrivesWithParticularPhysicalDrives")
+        response = self.verify_input_paramters(
+            raid_data, "CreateLogicalDrivesWithParticularPhysicalDrives")
         if not response["ret"]:
             return response
 
@@ -1622,7 +1663,8 @@ class iLOOemUtils(RedfishUtils):
         if logical_drives_details:
             raid_details = raid_data[:]
             for raid in raid_details:
-                response = self.check_logical_drives(raid, logical_drives_details, "CreateLogicalDrivesWithParticularPhysicalDrives")
+                response = self.check_logical_drives(
+                    raid, logical_drives_details, "CreateLogicalDrivesWithParticularPhysicalDrives")
                 if response["ret"]:
                     raid_data.remove(raid)
                 elif not response["ret"] and response["msg"] != "Logical drive provided is not present in server":
@@ -1635,11 +1677,12 @@ class iLOOemUtils(RedfishUtils):
             }
 
         response = self.check_physical_drive_count(raid_data, unused_physical_drives,
-                                                                "CreateLogicalDrivesWithParticularPhysicalDrives")
+                                                   "CreateLogicalDrivesWithParticularPhysicalDrives")
         if not response["ret"]:
             return response
 
-        response = self.check_physical_drives(raid_data, unused_physical_drives, "CreateLogicalDrivesWithParticularPhysicalDrives")
+        response = self.check_physical_drives(
+            raid_data, unused_physical_drives, "CreateLogicalDrivesWithParticularPhysicalDrives")
         if not response["ret"]:
             return response
 
@@ -1647,7 +1690,8 @@ class iLOOemUtils(RedfishUtils):
         if not response["ret"]:
             return response
 
-        response = self.get_request(self.root_uri + self.systems_uri + "smartstorageconfig/")
+        response = self.get_request(
+            self.root_uri + self.systems_uri + "smartstorageconfig/")
         if not response["ret"]:
             return response
 
@@ -1675,16 +1719,16 @@ class iLOOemUtils(RedfishUtils):
         # This function makes call to Server through redfish client to delete logical drives
         # in OOB controller whose names are given in the logical_drives_names parameter
 
-        #Check the iLO version
+        # Check the iLO version
         response = self.get_ilo_generation()
         if response['ret'] is False:
             return response
 
         if response["ilo_gen"] >= 6:
             return {
-                    "ret": False,
-                    "msg": "This operation is not supported for iLO %s servers" % (str(response["ilo_gen"]))
-                }
+                "ret": False,
+                "msg": "This operation is not supported for iLO %s servers" % (str(response["ilo_gen"]))
+            }
 
         body = {"LogicalDrives": [], "DataGuard": "Permissive"}
 
@@ -1704,7 +1748,7 @@ class iLOOemUtils(RedfishUtils):
             for mem in value:
                 logical_drives_details.append(mem)
 
-        logical_drives_not_present_list = [] 
+        logical_drives_not_present_list = []
         logical_drives_present_list = []
         for name in logical_drives_names:
             flag = False
@@ -1717,22 +1761,22 @@ class iLOOemUtils(RedfishUtils):
             if not flag:
                 logical_drives_not_present_list.append(name)
 
-        if not logical_drives_present_list: 
+        if not logical_drives_present_list:
             return {
                 "ret": False,
                 "changed": False,
                 "msg": "No logical drive(s) on the server match with the given logical drive(s) name %s." % logical_drives_not_present_list
-            }   
-            
+            }
+
         res = self.put_request(self.root_uri + url, body)
 
         if not res["ret"]:
             return res
-        
+
         msg = ''
         if logical_drives_not_present_list:
             msg = "Logical drive(s) with name %s didn't not present on the server." % logical_drives_not_present_list
-        
+
         return {
             "ret": True,
             "changed": True,
@@ -1814,8 +1858,8 @@ class iLOOemUtils(RedfishUtils):
             return {
                 "ret": False,
                 "msg": "The provided input SNMPv3 users is empty. Hence deleting SNMPv3 users failed"
-            } 
-                   
+            }
+
         server_snmpv3_users = self.get_snmpv3_users()
         if not server_snmpv3_users["ret"]:
             return server_snmpv3_users
@@ -1859,16 +1903,16 @@ class iLOOemUtils(RedfishUtils):
     def get_specified_logical_drives(self, logical_drives_names):
         # This method returns logical drives details for provided logical drive names
 
-        #Check the iLO version
+        # Check the iLO version
         response = self.get_ilo_generation()
         if response['ret'] is False:
             return response
 
         if response["ilo_gen"] >= 6:
             return {
-                    "ret": False,
-                    "msg": "This operation is not supported for iLO %s servers" % (str(response["ilo_gen"]))
-                }
+                "ret": False,
+                "msg": "This operation is not supported for iLO %s servers" % (str(response["ilo_gen"]))
+            }
 
         result = {}
         logical_drives_names_list = logical_drives_names[:]
@@ -1891,8 +1935,8 @@ class iLOOemUtils(RedfishUtils):
                     logical_drives_names_list.remove(drive_name)
 
         if logical_drives_names_list:
-            result["msg"] = "Logical drives with these names were not found on the server: %s " % str(logical_drives_names_list)
-
+            result["msg"] = "Logical drives with these names were not found on the server: %s " % str(
+                logical_drives_names_list)
 
         result["logical_drives_details"] = needed_logical_drives
 
@@ -1980,7 +2024,7 @@ class iLOOemUtils(RedfishUtils):
                 "ret": False,
                 "msg": "Minimum character length for privacy_passphrase or auth_passphrase is 8"
             }
-        
+
         if ("privacy_passphrase" in user and not len(user["privacy_passphrase"]) < 49) or \
                 ("auth_passphrase" in user and not len(user["auth_passphrase"]) < 49):
             return {
@@ -2068,7 +2112,8 @@ class iLOOemUtils(RedfishUtils):
 
     def validate_snmpv3_users(self, server_snmpv3_users, snmpv3_users, module):
         # Validating input parameters
-        input_result = self.validate_snmpv3_users_input(server_snmpv3_users, snmpv3_users, module)
+        input_result = self.validate_snmpv3_users_input(
+            server_snmpv3_users, snmpv3_users, module)
         if not input_result["ret"]:
             return input_result
 
@@ -2078,51 +2123,54 @@ class iLOOemUtils(RedfishUtils):
             return duplicate_entry_result
 
         # Checking if user already exists
-        response = self.check_if_snmpv3user_exists(server_snmpv3_users, snmpv3_users)
-        if module == "create": 
+        response = self.check_if_snmpv3user_exists(
+            server_snmpv3_users, snmpv3_users)
+        if module == "create":
             if response[0] and not response[1]:
-                message="SNMPv3 users %s already exist on the server."
+                message = "SNMPv3 users %s already exist on the server."
                 return {
                     "ret": False,
                     "msg": message % (str(response[0]))
                 }
             elif response[0] and response[1]:
-                message= "SNMPv3 user(s) {} already exist on the server, ".format(response[0])
+                message = "SNMPv3 user(s) {} already exist on the server, ".format(
+                    response[0])
                 return {
                     "ret": True,
-                    "validate_users":response[1],
-                    "msg": message 
+                    "validate_users": response[1],
+                    "msg": message
                 }
             elif not response[0] and response[1]:
-                message= "SNMPv3 users "
+                message = "SNMPv3 users "
                 return {
                     "ret": True,
-                    "validate_users":response[1],
+                    "validate_users": response[1],
                     "msg": message
-                } 
-                           
+                }
+
         if module == "update":
             if response[1] and not response[0]:
                 return {
                     "ret": False,
                     "msg": "Provided SNMPv3 users are not present in the server: %s" % str(response[1])
-            
+
                 }
             elif response[0] and response[1]:
-                message = "Provided SNMPv3 user(s) {} are not present in the server.".format(response[1])
-                
+                message = "Provided SNMPv3 user(s) {} are not present in the server.".format(
+                    response[1])
+
                 return {
                     "ret": True,
-                    "update_users":response[0],
-                    "msg": message 
+                    "update_users": response[0],
+                    "msg": message
                 }
-            
+
             elif response[0] and not response[1]:
                 message = ""
                 return {
                     "ret": True,
-                    "update_users":response[0],
-                     "msg": message 
+                    "update_users": response[0],
+                    "msg": message
                 }
 
         return {"ret": True}
@@ -2135,14 +2183,15 @@ class iLOOemUtils(RedfishUtils):
         server_snmpv3_users = server_snmpv3_users["msg"]
 
         # Validating input
-        validate_result = self.validate_snmpv3_users(server_snmpv3_users, snmpv3_users, "update")
+        validate_result = self.validate_snmpv3_users(
+            server_snmpv3_users, snmpv3_users, "update")
         if not validate_result["ret"]:
             return validate_result
-        
-        msg=''
-        valid_snmpv3_users=[]
+
+        msg = ''
+        valid_snmpv3_users = []
         if validate_result.get("msg"):
-            msg=validate_result["msg"]
+            msg = validate_result["msg"]
 
         for user in validate_result["update_users"]:
             for each in snmpv3_users:
@@ -2178,7 +2227,7 @@ class iLOOemUtils(RedfishUtils):
                     break
 
             # Check if user matches all parameter with the one on the server
-            difference = False 
+            difference = False
             if "AuthPassphrase" in body.keys() or "PrivacyPassphrase" in body.keys():
                 difference = True
             else:
@@ -2199,56 +2248,57 @@ class iLOOemUtils(RedfishUtils):
             else:
                 unchanged_users.append(body["SecurityName"])
         if updated_users:
-            return {"ret": True, "changed": True, "msg": msg +  "The following SNMPv3 user(s) were updated %s." % str(updated_users)}
+            return {"ret": True, "changed": True, "msg": msg + "The following SNMPv3 user(s) were updated %s." % str(updated_users)}
         else:
             return {"ret": True, "changed": True, "msg": msg + "No SNMPv3 users were updated, as user(s) in the input already match those on the server."}
 
     def create_snmpv3_users(self, snmpv3_users):
-            # This method creates SNMPv3 users
-            server_snmpv3_users = self.get_snmpv3_users()
-            if not server_snmpv3_users["ret"]:
-                return server_snmpv3_users
-            server_snmpv3_users = server_snmpv3_users["msg"]
-            # Validating SNMPv3 users input
-            validate_result = self.validate_snmpv3_users(server_snmpv3_users, snmpv3_users, "create")
-            if not validate_result["ret"]:
-                return validate_result
-            msg=''
-            if validate_result.get("msg"):
-                msg=validate_result["msg"]
-            valid_snmpv3_users=[]
-            for user in validate_result["validate_users"]:
-                for each in snmpv3_users:
-                    if user == each['security_name']:
-                        valid_snmpv3_users.append(each)
+        # This method creates SNMPv3 users
+        server_snmpv3_users = self.get_snmpv3_users()
+        if not server_snmpv3_users["ret"]:
+            return server_snmpv3_users
+        server_snmpv3_users = server_snmpv3_users["msg"]
+        # Validating SNMPv3 users input
+        validate_result = self.validate_snmpv3_users(
+            server_snmpv3_users, snmpv3_users, "create")
+        if not validate_result["ret"]:
+            return validate_result
+        msg = ''
+        if validate_result.get("msg"):
+            msg = validate_result["msg"]
+        valid_snmpv3_users = []
+        for user in validate_result["validate_users"]:
+            for each in snmpv3_users:
+                if user == each['security_name']:
+                    valid_snmpv3_users.append(each)
 
-            # for user in snmpv3_users:
-            for user in valid_snmpv3_users:
-                # Define payload
-                body = {
-                    "SecurityName": user['security_name'],
-                    "AuthProtocol": user['auth_protocol'],
-                    "AuthPassphrase": user['auth_passphrase'],
-                    "PrivacyProtocol": user['privacy_protocol'],
-                    "PrivacyPassphrase": user['privacy_passphrase']
+        # for user in snmpv3_users:
+        for user in valid_snmpv3_users:
+            # Define payload
+            body = {
+                "SecurityName": user['security_name'],
+                "AuthProtocol": user['auth_protocol'],
+                "AuthPassphrase": user['auth_passphrase'],
+                "PrivacyProtocol": user['privacy_protocol'],
+                "PrivacyPassphrase": user['privacy_passphrase']
+            }
+
+            # Add engine ID if provided
+            if 'user_engine_id' in user.keys():
+                body["UserEngineID"] = user['user_engine_id']
+
+            # POST on Managers API
+            uri = self.root_uri + self.manager_uri + "SnmpService/SNMPUsers/"
+            snmp_res = self.post_request(uri, body)
+            if not snmp_res["ret"]:
+                return {
+                    "ret": False,
+                    "msg": snmp_res
                 }
 
-                # Add engine ID if provided
-                if 'user_engine_id' in user.keys():
-                    body["UserEngineID"] = user['user_engine_id']
+        if "validate_users" in validate_result.keys():
+            return {"ret": True, "changed": True, "msg": msg + "User(s) {} were successfully created".format(validate_result["validate_users"])}
 
-                # POST on Managers API
-                uri = self.root_uri + self.manager_uri + "SnmpService/SNMPUsers/"
-                snmp_res = self.post_request(uri, body)
-                if not snmp_res["ret"]:
-                    return {
-                        "ret": False,
-                        "msg": snmp_res
-                    }
-                
-            if "validate_users" in validate_result.keys():
-                return {"ret": True, "changed": True, "msg": msg + "User(s) {} were successfully created".format(validate_result["validate_users"])}
-                                
     def check_snmpv3_username(self, dest):
         if "security_name" not in dest or not dest["security_name"]:
             return {
@@ -2282,7 +2332,8 @@ class iLOOemUtils(RedfishUtils):
                 "msg": message % (len(server_alert_destinations), len(alert_destinations))
             }
         input_list = ['alert_destination', 'snmp_alert_protocol']
-        allowed_list = ['alert_destination', 'snmp_alert_protocol', 'trap_community', 'security_name']
+        allowed_list = ['alert_destination',
+                        'snmp_alert_protocol', 'trap_community', 'security_name']
         for dest in alert_destinations:
             for input in input_list:
                 if input not in dest.keys():
@@ -2329,7 +2380,8 @@ class iLOOemUtils(RedfishUtils):
                 else:
                     hostname = str(dest["alert_destination"])
 
-                allowed = re.compile(r"(?!-)[A-Z\d-]{1,63}(?<!-)$", re.IGNORECASE)
+                allowed = re.compile(
+                    r"(?!-)[A-Z\d-]{1,63}(?<!-)$", re.IGNORECASE)
                 if not all(allowed.match(x) for x in hostname.split(".")):
                     return {
                         "ret": False,
@@ -2373,7 +2425,8 @@ class iLOOemUtils(RedfishUtils):
         server_alert_destinations = server_alert_destinations["msg"]
 
         # Validating alert destination input
-        alert_destinations = self.validate_alert_destinations(server_alert_destinations, alert_destinations)
+        alert_destinations = self.validate_alert_destinations(
+            server_alert_destinations, alert_destinations)
         if not alert_destinations["ret"]:
             return alert_destinations
         alert_destinations = alert_destinations["msg"]
@@ -2421,14 +2474,16 @@ class iLOOemUtils(RedfishUtils):
     def get_snmpv3_users(self):
         # This method returns list of SNMPv3 users
         snmpv3_users = []
-        properties = ["AuthProtocol", "Id", "PrivacyProtocol", "SecurityName", "UserEngineID"]
+        properties = ["AuthProtocol", "Id",
+                      "PrivacyProtocol", "SecurityName", "UserEngineID"]
 
         response = self.get_request(self.root_uri + self.manager_uri)
         if not response["ret"]:
             return response
 
         # Get a list of all SNMPv3 Users and build respective URIs
-        response = self.get_request(self.root_uri + self.manager_uri + "SnmpService/SNMPUsers/")
+        response = self.get_request(
+            self.root_uri + self.manager_uri + "SnmpService/SNMPUsers/")
         if not response["ret"]:
             return response
         snmp_list = response["data"]
@@ -2454,15 +2509,18 @@ class iLOOemUtils(RedfishUtils):
     def get_snmp_alert_destinations(self):
         # This method returns list of SNMP alert destinations
         alert_destinations = []
-        properties = ["AlertDestination", "Id", "SNMPAlertProtocol", "SNMPv3User", "SecurityName", "TrapCommunity"]
-        snmpv3_user_properties = ["AuthProtocol", "Id", "PrivacyProtocol", "SecurityName", "UserEngineID"]
+        properties = ["AlertDestination", "Id", "SNMPAlertProtocol",
+                      "SNMPv3User", "SecurityName", "TrapCommunity"]
+        snmpv3_user_properties = ["AuthProtocol", "Id",
+                                  "PrivacyProtocol", "SecurityName", "UserEngineID"]
 
         response = self.get_request(self.root_uri + self.manager_uri)
         if not response["ret"]:
             return response
 
         # Get a list of all SNMP ALert Destinations and build respective URIs
-        response = self.get_request(self.root_uri + self.manager_uri + "SnmpService/SNMPAlertDestinations/")
+        response = self.get_request(
+            self.root_uri + self.manager_uri + "SnmpService/SNMPAlertDestinations/")
         if not response["ret"]:
             return response
         snmp_list = response["data"]
@@ -2479,7 +2537,8 @@ class iLOOemUtils(RedfishUtils):
                     alert_destination[property] = data[property]
 
             if "SNMPv3User" in alert_destination:
-                response = self.get_request(self.root_uri + alert_destination["SNMPv3User"]["@odata.id"])
+                response = self.get_request(
+                    self.root_uri + alert_destination["SNMPv3User"]["@odata.id"])
                 if not response["ret"]:
                     return response
                 data = response["data"]
@@ -2577,7 +2636,7 @@ class iLOOemUtils(RedfishUtils):
 
         # define payload
         payload = {
-             "ResetType": "ColdBoot"
+            "ResetType": "ColdBoot"
         }
 
         # POST to Action URI
@@ -2612,7 +2671,8 @@ class iLOOemUtils(RedfishUtils):
 
         # post on self.root_uri + self.service_root + /Managers/1- + /Actions/Oem/Hpe/HpeiLO.ResetToFactoryDefaults/
         factory_reset_body = {"ResetType": "Default"}
-        response = self.post_request(self.root_uri + factory_reset_uri, factory_reset_body)
+        response = self.post_request(
+            self.root_uri + factory_reset_uri, factory_reset_body)
 
         if not response["ret"]:
             return response
@@ -2706,7 +2766,8 @@ class iLOOemUtils(RedfishUtils):
             }
 
         for each_member in members:
-            delete_res = self.delete_request(self.root_uri + each_member["@odata.id"])
+            delete_res = self.delete_request(
+                self.root_uri + each_member["@odata.id"])
             if not delete_res["ret"]:
                 return delete_res
 
@@ -2750,7 +2811,8 @@ class iLOOemUtils(RedfishUtils):
         backup_body = {}
 
         # Post on self.root_uri + self.service_root + /Managers/1 + /BackupRestoreService/ + /BackupFiles/
-        response = self.post_request(self.root_uri + backup_files_url, backup_body)
+        response = self.post_request(
+            self.root_uri + backup_files_url, backup_body)
         if not response["ret"]:
             return response
 
@@ -2826,7 +2888,7 @@ class iLOOemUtils(RedfishUtils):
                 or "target" not in response_data["Actions"]["#HpeiLOBackupFile.Restore"]:
             return {
                 "ret": False,
-                "msg": "Restore url not found in the response, %s" %(response_data)
+                "msg": "Restore url not found in the response, %s" % (response_data)
             }
 
         restore_url = response_data["Actions"]["#HpeiLOBackupFile.Restore"]["target"]
@@ -3029,7 +3091,7 @@ class iLOOemUtils(RedfishUtils):
         }
 
     def get_phy_nic_info(self):
-        
+
         # Get on self.root_uri + self.service_root + /systems/1
         response = self.get_request(self.root_uri + self.systems_uri)
         if not response["ret"]:
@@ -3090,7 +3152,8 @@ class iLOOemUtils(RedfishUtils):
         else:
 
             # Get on self.root_uri + self.service_root + /Chassis/1
-            response = self.get_request(self.root_uri + self.service_root + "Chassis/1/")
+            response = self.get_request(
+                self.root_uri + self.service_root + "Chassis/1/")
             if not response["ret"]:
                 return response
 
@@ -3124,10 +3187,10 @@ class iLOOemUtils(RedfishUtils):
             for item in nwk_adapt_rsp_data["Members"]:
                 if "@odata.id" not in item:
                     return {
-                    "ret": False,
-                    "changed": False,
-                    "msg": "'@odata.id' not found in NetworkAdapters response, %s" % (rsp_data)
-                }
+                        "ret": False,
+                        "changed": False,
+                        "msg": "'@odata.id' not found in NetworkAdapters response, %s" % (rsp_data)
+                    }
                 # Get on each member eg : self.root_uri + self.service_root + /chassis/1 + /NetworkAdapters/<ID>
                 item_rsp = self.get_request(self.root_uri + item["@odata.id"])
                 if not item_rsp["ret"]:
@@ -3137,7 +3200,8 @@ class iLOOemUtils(RedfishUtils):
 
                 # Condition for DA**** and DE*****
                 if "NetworkDeviceFunctions" in mem_data and "@odata.id" in mem_data["NetworkDeviceFunctions"]:
-                    response = self.get_request(self.root_uri + mem_data["NetworkDeviceFunctions"]["@odata.id"])
+                    response = self.get_request(
+                        self.root_uri + mem_data["NetworkDeviceFunctions"]["@odata.id"])
 
                     if not response["ret"]:
                         return response
@@ -3159,20 +3223,21 @@ class iLOOemUtils(RedfishUtils):
                                 "msg": "'@odata.id' not found in Network device function response, %s" % (response_data)
                             }
                         # Get on each member eg : self.root_uri + self.service_root + /systems/1 + /
-                        item_rsp = self.get_request(self.root_uri + item["@odata.id"])
+                        item_rsp = self.get_request(
+                            self.root_uri + item["@odata.id"])
                         if not item_rsp["ret"]:
                             return item_rsp
 
-                        nwk_device_fn_mem_data = item_rsp["data"]  
-                        rsp_list.append(nwk_device_fn_mem_data) 
+                        nwk_device_fn_mem_data = item_rsp["data"]
+                        rsp_list.append(nwk_device_fn_mem_data)
 
-                    response_data["Members"] = rsp_list   
+                    response_data["Members"] = rsp_list
                     mem_data["NetworkDeviceFunctions"] = response_data
-                
 
-            # Get Port information 
+            # Get Port information
                 if "Ports" in mem_data and "@odata.id" in mem_data["Ports"]:
-                    response = self.get_request(self.root_uri + mem_data["Ports"]["@odata.id"])
+                    response = self.get_request(
+                        self.root_uri + mem_data["Ports"]["@odata.id"])
 
                     if not response["ret"]:
                         return response
@@ -3183,7 +3248,7 @@ class iLOOemUtils(RedfishUtils):
                             "ret": False,
                             "changed": False,
                             "msg": response_data
-                        }    
+                        }
                     rsp_list = []
 
                     for item in response_data["Members"]:
@@ -3194,16 +3259,17 @@ class iLOOemUtils(RedfishUtils):
                                 "msg": "'@odata.id' not found in Ports response, %s" % (response_data)
                             }
                         # Get on each member eg : self.root_uri + self.service_root + /systems/1 + /
-                        item_rsp = self.get_request(self.root_uri + item["@odata.id"])
+                        item_rsp = self.get_request(
+                            self.root_uri + item["@odata.id"])
                         if not item_rsp["ret"]:
                             return item_rsp
 
-                        ports_mem_data = item_rsp["data"]  
-                        rsp_list.append(ports_mem_data) 
+                        ports_mem_data = item_rsp["data"]
+                        rsp_list.append(ports_mem_data)
 
-                    response_data["Members"] = rsp_list  
+                    response_data["Members"] = rsp_list
                     mem_data["Ports"] = response_data
- 
+
                 # storing the result in a list
                 nic.append(mem_data)
 
@@ -3219,14 +3285,17 @@ class iLOOemUtils(RedfishUtils):
             return response
 
         security_service_uri = "Managers/1/SecurityService/"
-        security_service = self.get_request(self.root_uri + self.service_root + security_service_uri)
+        security_service = self.get_request(
+            self.root_uri + self.service_root + security_service_uri)
         if not security_service["ret"]:
             return security_service
 
         security_service_data = security_service["data"]
 
-        self.certificate_authentication_uri = security_service_data["Links"]["CertAuth"]["@odata.id"]
-        certificate_authentication = self.get_request(self.root_uri + self.certificate_authentication_uri)      
+        self.certificate_authentication_uri = security_service_data[
+            "Links"]["CertAuth"]["@odata.id"]
+        certificate_authentication = self.get_request(
+            self.root_uri + self.certificate_authentication_uri)
         if not certificate_authentication["ret"]:
             return certificate_authentication
 
@@ -3243,7 +3312,7 @@ class iLOOemUtils(RedfishUtils):
         certificate_authentication_data = certificate_authentication["data"]
 
         if "CACertificates" not in certificate_authentication_data or "@odata.id" not in \
-            certificate_authentication_data["CACertificates"]:
+                certificate_authentication_data["CACertificates"]:
             return {
                 "ret": False,
                 "changed": False,
@@ -3251,7 +3320,7 @@ class iLOOemUtils(RedfishUtils):
             }
 
         ca_certifcates_url = certificate_authentication_data["CACertificates"]["@odata.id"]
-        ca_certificates = self.get_request(self.root_uri + ca_certifcates_url)      
+        ca_certificates = self.get_request(self.root_uri + ca_certifcates_url)
         if not ca_certificates["ret"]:
             return ca_certificates
         ca_certificates_data = ca_certificates["data"]
@@ -3271,21 +3340,21 @@ class iLOOemUtils(RedfishUtils):
 
     def set_spdm_settings(self, spdm_settings):
         # This function sets SPDM settings on an OOB controller
-        #Check the iLO version
+        # Check the iLO version
         response = self.get_ilo_generation()
         if response['ret'] is False:
             return response
 
         if response["ilo_gen"] < 6:
             return {
-                    "ret": False,
-                    "msg": "This operation is not supported for iLO %s servers" % (str(response["ilo_gen"]))
-                }
+                "ret": False,
+                "msg": "This operation is not supported for iLO %s servers" % (str(response["ilo_gen"]))
+            }
 
         # Validating inputs
         valid_spdm_settings = {
-        "global_component_integrity": ["Enabled", "Disabled"], 
-        "component_integrity_policy": ["NoPolicy", "HaltBootOnSPDMFailure"]}
+            "global_component_integrity": ["Enabled", "Disabled"],
+            "component_integrity_policy": ["NoPolicy", "HaltBootOnSPDMFailure"]}
 
         if spdm_settings is None or spdm_settings == {}:
             return {
@@ -3305,12 +3374,13 @@ class iLOOemUtils(RedfishUtils):
                 return {
                     "ret": False,
                     "changed": False,
-                    "msg": "%s parameter only supports %s. Provide one of these values to set SPDM settings." \
-                            % (str(key), str(value))
+                    "msg": "%s parameter only supports %s. Provide one of these values to set SPDM settings."
+                    % (str(key), str(value))
                 }
 
         # Get server details
-        response = self.get_request(self.root_uri + self.service_root + "Managers/1/")
+        response = self.get_request(
+            self.root_uri + self.service_root + "Managers/1/")
         if response["ret"] is False:
             return response
         server_details = response["data"]
@@ -3319,7 +3389,7 @@ class iLOOemUtils(RedfishUtils):
         if "Oem" not in server_details or "Hpe" not in server_details["Oem"] or \
             "Links" not in server_details["Oem"]["Hpe"] or \
             "SecurityService" not in server_details["Oem"]["Hpe"]["Links"] or \
-            "@odata.id" not in server_details["Oem"]["Hpe"]["Links"]["SecurityService"]:
+                "@odata.id" not in server_details["Oem"]["Hpe"]["Links"]["SecurityService"]:
             return {
                 "ret": False,
                 "changed": False,
@@ -3345,22 +3415,22 @@ class iLOOemUtils(RedfishUtils):
         return {
             "ret": True,
             "changed": True,
-            "msg": "GlobalComponentIntegrity %s. ComponentIntegrityPolicy set to %s. Server reboot required." \
-                    % (spdm_settings["global_component_integrity"], spdm_settings["component_integrity_policy"])
+            "msg": "GlobalComponentIntegrity %s. ComponentIntegrityPolicy set to %s. Server reboot required."
+            % (spdm_settings["global_component_integrity"], spdm_settings["component_integrity_policy"])
         }
 
     def get_drive_operating_mode(self, ip_addr):
         # This function collects the drive operating mode on an OOB controller
-        #Check the iLO version
+        # Check the iLO version
         response = self.get_ilo_generation()
         if response['ret'] is False:
             return response
 
         if response["ilo_gen"] >= 6:
             return {
-                    "ret": False,
-                    "msg": "This operation is not supported for iLO %s servers" % (str(response["ilo_gen"]))
-                }
+                "ret": False,
+                "msg": "This operation is not supported for iLO %s servers" % (str(response["ilo_gen"]))
+            }
 
         # Get ArrayControllers
         response = self.get_request(self.root_uri + self.systems_uri)
@@ -3371,25 +3441,27 @@ class iLOOemUtils(RedfishUtils):
         if "Oem" not in server_details or "Hpe" not in server_details["Oem"] or \
             "Links" not in server_details["Oem"]["Hpe"] or \
             "SmartStorage" not in server_details["Oem"]["Hpe"]["Links"] or \
-            "@odata.id" not in server_details["Oem"]["Hpe"]["Links"]["SmartStorage"]:
+                "@odata.id" not in server_details["Oem"]["Hpe"]["Links"]["SmartStorage"]:
             return {
                 "ret": False,
                 "msg": "SmartStorage url not found in response, %s" % (server_details)
             }
 
-        response = self.get_request(self.root_uri + server_details["Oem"]["Hpe"]["Links"]["SmartStorage"]["@odata.id"])
+        response = self.get_request(
+            self.root_uri + server_details["Oem"]["Hpe"]["Links"]["SmartStorage"]["@odata.id"])
         if not response["ret"]:
             return response
         data = response["data"]
 
         if "Links" not in data or "ArrayControllers" not in data["Links"] or \
-            "@odata.id" not in data["Links"]["ArrayControllers"]:
+                "@odata.id" not in data["Links"]["ArrayControllers"]:
             return {
                 "ret": False,
                 "msg": "ArrayControllers url not found in response, %s" % (data)
             }
 
-        response = self.get_request(self.root_uri + data["Links"]["ArrayControllers"]["@odata.id"])
+        response = self.get_request(
+            self.root_uri + data["Links"]["ArrayControllers"]["@odata.id"])
         if not response["ret"]:
             return response
         init_data = response["data"]
@@ -3411,7 +3483,8 @@ class iLOOemUtils(RedfishUtils):
             json_data = array_res["data"]
 
             if 'CurrentOperatingMode' in json_data:
-                mode_details.append({'ilo': ip_addr, 'operating_mode': json_data['CurrentOperatingMode']})
+                mode_details.append(
+                    {'ilo': ip_addr, 'operating_mode': json_data['CurrentOperatingMode']})
             else:
                 return {
                     "ret": False,
@@ -3430,12 +3503,14 @@ class iLOOemUtils(RedfishUtils):
 
         certificate_authentication_data = certificate_authentication["data"]
 
-        import_trusted_ca_uri = certificate_authentication_data["Actions"]["#HpeCertAuth.ImportCACertificate"]["target"]
+        import_trusted_ca_uri = certificate_authentication_data[
+            "Actions"]["#HpeCertAuth.ImportCACertificate"]["target"]
 
         cafile = open(ca_file)
         ca_file_data = cafile.readlines()
 
-        ca_file_data = ca_file_data[ca_file_data.index("-----BEGIN CERTIFICATE-----\n"):ca_file_data.index("-----END CERTIFICATE-----\n")+1]
+        ca_file_data = ca_file_data[ca_file_data.index(
+            "-----BEGIN CERTIFICATE-----\n"):ca_file_data.index("-----END CERTIFICATE-----\n")+1]
         ca_file_data = "".join(ca_file_data)
 
         payload = {
@@ -3466,15 +3541,18 @@ class iLOOemUtils(RedfishUtils):
 
         certificate_authentication_data = certificate_authentication["data"]
 
-        user_certificate_mapping_uri = certificate_authentication_data["Links"]["UserCertificateMapping"]["@odata.id"]
+        user_certificate_mapping_uri = certificate_authentication_data[
+            "Links"]["UserCertificateMapping"]["@odata.id"]
 
-        user_certificate_mapping_data = self.get_request(self.root_uri + user_certificate_mapping_uri)
+        user_certificate_mapping_data = self.get_request(
+            self.root_uri + user_certificate_mapping_uri)
         if not user_certificate_mapping_data["ret"]:
             return user_certificate_mapping_data
 
         flag = False
         for member in user_certificate_mapping_data["data"]["Members"]:
-            member_request = self.get_request(self.root_uri + member["@odata.id"])
+            member_request = self.get_request(
+                self.root_uri + member["@odata.id"])
             if not member_request["ret"]:
                 return member_request
 
@@ -3487,8 +3565,9 @@ class iLOOemUtils(RedfishUtils):
 
         cert_file = open(user_cert_file)
         cert_file_data = cert_file.readlines()
-        
-        cert_file_data = cert_file_data[cert_file_data.index("-----BEGIN CERTIFICATE-----\n"):cert_file_data.index("-----END CERTIFICATE-----\n")+1]
+
+        cert_file_data = cert_file_data[cert_file_data.index(
+            "-----BEGIN CERTIFICATE-----\n"):cert_file_data.index("-----END CERTIFICATE-----\n")+1]
         cert_file_data = "".join(cert_file_data)
 
         payload = {
@@ -3496,7 +3575,8 @@ class iLOOemUtils(RedfishUtils):
             "UserName": username
         }
 
-        res = self.post_request(self.root_uri + user_certificate_mapping_uri, payload)
+        res = self.post_request(
+            self.root_uri + user_certificate_mapping_uri, payload)
         if not res["ret"]:
             return res
 
@@ -3510,20 +3590,20 @@ class iLOOemUtils(RedfishUtils):
             "changed": True,
             "msg": msg
         }
-        
+
     def erase_physical_drives(self):
         # This function erase the physical drives on an OOB controller
 
-        #Check the iLO version
+        # Check the iLO version
         response = self.get_ilo_generation()
         if response['ret'] is False:
             return response
 
         if response["ilo_gen"] >= 6:
             return {
-                    "ret": False,
-                    "msg": "This operation is not supported for iLO %s servers" % (str(response["ilo_gen"]))
-                }
+                "ret": False,
+                "msg": "This operation is not supported for iLO %s servers" % (str(response["ilo_gen"]))
+            }
 
         # Check if systems endpoint is present
         response = self.get_request(self.root_uri + self.systems_uri)
@@ -3592,7 +3672,8 @@ class iLOOemUtils(RedfishUtils):
             }
         else:
             payload = {"CertificateLoginEnabled": True}
-            res = self.patch_request(self.root_uri + self.certificate_authentication_uri, payload)
+            res = self.patch_request(
+                self.root_uri + self.certificate_authentication_uri, payload)
             if not res["ret"]:
                 return res
 
@@ -3610,7 +3691,8 @@ class iLOOemUtils(RedfishUtils):
 
         server_details = response["data"]
 
-        response = self.get_request(self.root_uri + server_details["Oem"]["Hpe"]["Links"]["MySession"]["@odata.id"])
+        response = self.get_request(
+            self.root_uri + server_details["Oem"]["Hpe"]["Links"]["MySession"]["@odata.id"])
         if not response["ret"]:
             return response
 
@@ -3647,7 +3729,7 @@ class iLOOemUtils(RedfishUtils):
         }
 
     def get_device_inventory_info(self):
-                        
+
         chassis_url = self.service_root + "Chassis/"
         res = self.get_request(self.root_uri + chassis_url)
         if not res["ret"]:
@@ -3702,7 +3784,8 @@ class iLOOemUtils(RedfishUtils):
                 device_list = []
                 if "DeviceInstances" in device_details:
                     for instance in device_details["DeviceInstances"]:
-                        pci_device_details = self.get_request(self.root_uri + instance["@odata.id"])
+                        pci_device_details = self.get_request(
+                            self.root_uri + instance["@odata.id"])
                         if not pci_device_details["ret"]:
                             return {
                                 "ret": False,
@@ -3944,45 +4027,47 @@ class iLOOemUtils(RedfishUtils):
         data = response['data']
         if "Oem" in data and "Hpe" in data["Oem"] and "Manager" in data["Oem"]["Hpe"] and "HostName" in data["Oem"]["Hpe"]["Manager"][0]:
             return {
-            "ret": True,
-            "msg": "The hostname of the server is '{}'" .format(data["Oem"]["Hpe"]["Manager"][0]["HostName"])
-        }
+                "ret": True,
+                "msg": "The hostname of the server is '{}'" .format(data["Oem"]["Hpe"]["Manager"][0]["HostName"])
+            }
 
         return {
             "ret": False,
             "msg": "HostName could not be found."
         }
 
-    def firmware_upgrade_with_upload(self,image_uri,file_name,upgrade = True):
+    def firmware_upgrade_with_upload(self, image_uri, file_name, upgrade=True):
         # This method upgrades the firmware image along with uploading to iLO repository
         # Get on self.root_uri + self.service_root + /UpdateService
-        response = self.get_request(self.root_uri + self.service_root + "UpdateService/")
+        response = self.get_request(
+            self.root_uri + self.service_root + "UpdateService/")
         if not response["ret"]:
             return response
-        
-        json_data = response["data"]  
+
+        json_data = response["data"]
         if "Oem" not in json_data or "Hpe" not in json_data["Oem"] or "Actions" not in json_data["Oem"]["Hpe"] or \
             "#HpeiLOUpdateServiceExt.AddFromUri" not in json_data["Oem"]["Hpe"]["Actions"] or \
-            "target" not in json_data["Oem"]["Hpe"]["Actions"]["#HpeiLOUpdateServiceExt.AddFromUri"]:
+                "target" not in json_data["Oem"]["Hpe"]["Actions"]["#HpeiLOUpdateServiceExt.AddFromUri"]:
             return {
                 "ret": False,
                 "changed": False,
-                "msg": "target url not found in the response, %s" %(json_data["data"])
+                "msg": "target url not found in the response, %s" % (json_data["data"])
             }
         # check the file already present in the server or not
         ilo_repo_rsp = self.get_ilo_repo_details()
         if not ilo_repo_rsp["ret"]:
             return ilo_repo_rsp
-        
+
         for each_file_name in ilo_repo_rsp["msg"]["Members"]:
-            if( (each_file_name["Filename"] == file_name or (file_name == '' and each_file_name["Filename"] == image_uri.split('/')[-1]) ) and each_file_name["Locked"]):
+            if((each_file_name["Filename"] == file_name or (file_name == '' and each_file_name["Filename"] == image_uri.split('/')[-1])) and each_file_name["Locked"]):
                 return {
                     "ret": False,
                     "changed": False,
-                    "msg": "The file with name '%s' already exists in the repository and is locked. Remove the install set or task that is locking the component and try again." %(each_file_name["Filename"])
+                    "msg": "The file with name '%s' already exists in the repository and is locked. Remove the install set or task that is locking the component and try again." % (each_file_name["Filename"])
                 }
 
-        update_url = self.root_uri + json_data["Oem"]["Hpe"]["Actions"]["#HpeiLOUpdateServiceExt.AddFromUri"]["target"]
+        update_url = self.root_uri + \
+            json_data["Oem"]["Hpe"]["Actions"]["#HpeiLOUpdateServiceExt.AddFromUri"]["target"]
         body = {
             "ImageURI": image_uri,
             "UpdateRepository": True,
@@ -3993,11 +4078,11 @@ class iLOOemUtils(RedfishUtils):
         if(file_name != ''):
             body["ComponentFileName"] = file_name
 
-        response = self.post_request(update_url,body)
+        response = self.post_request(update_url, body)
         if not response["ret"]:
             return response
 
-        data = response["resp"]        
+        data = response["resp"]
         json_data = json.loads(data.read().decode('utf8'))
         return {
             "ret": True,
@@ -4008,7 +4093,8 @@ class iLOOemUtils(RedfishUtils):
     def get_maintenance_window(self):
         # This method outputs all the maintenance windows details present in server.
         # Get on self.root_uri + self.service_root + /UpdateService
-        response = self.get_request(self.root_uri + self.service_root + "UpdateService/")
+        response = self.get_request(
+            self.root_uri + self.service_root + "UpdateService/")
         if not response["ret"]:
             return response
 
@@ -4016,7 +4102,7 @@ class iLOOemUtils(RedfishUtils):
 
         if "Oem" not in json_data or "Hpe" not in json_data["Oem"] or \
             "MaintenanceWindows" not in json_data["Oem"]["Hpe"] or \
-            "@odata.id" not in json_data["Oem"]["Hpe"]["MaintenanceWindows"]:
+                "@odata.id" not in json_data["Oem"]["Hpe"]["MaintenanceWindows"]:
             return {
                 "ret": False,
                 "changed": False,
@@ -4026,7 +4112,8 @@ class iLOOemUtils(RedfishUtils):
         maintenance_window_url = json_data["Oem"]["Hpe"]["MaintenanceWindows"]["@odata.id"]
 
         # Get on self.root_uri + self.service_root + /UpdateService + /MaintenanceWindows/
-        maintenance_window_rsp = self.get_request(self.root_uri + maintenance_window_url)
+        maintenance_window_rsp = self.get_request(
+            self.root_uri + maintenance_window_url)
         if not maintenance_window_rsp["ret"]:
             return maintenance_window_rsp
 
@@ -4042,17 +4129,18 @@ class iLOOemUtils(RedfishUtils):
                 mem_data = item_rsp["data"]
                 # storing the result in a list
                 maintenance_window_details.append(mem_data)
-    
+
         return {
             "ret": True,
             "changed": False,
             "msg": maintenance_window_details
         }
 
-    def create_maintenance_window(self,maintenance_window_data):
+    def create_maintenance_window(self, maintenance_window_data):
         # This method creates a new maintenance window and outputs the id of it.
         # Get on self.root_uri + self.service_root + /UpdateService
-        response = self.get_request(self.root_uri + self.service_root + "UpdateService/")
+        response = self.get_request(
+            self.root_uri + self.service_root + "UpdateService/")
         if not response["ret"]:
             return response
 
@@ -4060,7 +4148,7 @@ class iLOOemUtils(RedfishUtils):
 
         if "Oem" not in json_data or "Hpe" not in json_data["Oem"] or \
             "MaintenanceWindows" not in json_data["Oem"]["Hpe"] or \
-            "@odata.id" not in json_data["Oem"]["Hpe"]["MaintenanceWindows"]:
+                "@odata.id" not in json_data["Oem"]["Hpe"]["MaintenanceWindows"]:
             return {
                 "ret": False,
                 "changed": False,
@@ -4071,8 +4159,10 @@ class iLOOemUtils(RedfishUtils):
 
         # Check whether the start time is greater than expire time
 
-        start_time = datetime.strptime(maintenance_window_data["StartAfter"], "%Y-%m-%dT%H:%M:%SZ")
-        end_time = datetime.strptime(maintenance_window_data["Expire"], "%Y-%m-%dT%H:%M:%SZ") 
+        start_time = datetime.strptime(
+            maintenance_window_data["StartAfter"], "%Y-%m-%dT%H:%M:%SZ")
+        end_time = datetime.strptime(
+            maintenance_window_data["Expire"], "%Y-%m-%dT%H:%M:%SZ")
 
         if(start_time > end_time):
             return {
@@ -4080,7 +4170,7 @@ class iLOOemUtils(RedfishUtils):
                 "changed": False,
                 "msg": "Provided StartAfter time should be earlier than the Expire time"
             }
-        response = self.get_request(self.root_uri + self.service_root )
+        response = self.get_request(self.root_uri + self.service_root)
         if not response["ret"]:
             return response
 
@@ -4093,26 +4183,27 @@ class iLOOemUtils(RedfishUtils):
         # Check for maintenance window will expire before it is created
         if (ilo_time > end_time):
             return {
-               "ret": False,
-               "changed": False,
-               "msg": "Provided Expire time should be later than the iLO server time"               
+                "ret": False,
+                "changed": False,
+                "msg": "Provided Expire time should be later than the iLO server time"
             }
 
-
-        maintenance_window_body = {          
-           "Name": str(maintenance_window_data["Name"]),
-           "StartAfter": maintenance_window_data["StartAfter"],
-           "Expire": maintenance_window_data["Expire"]
+        maintenance_window_body = {
+            "Name": str(maintenance_window_data["Name"]),
+            "StartAfter": maintenance_window_data["StartAfter"],
+            "Expire": maintenance_window_data["Expire"]
         }
 
         if "maintenance_window_description" in maintenance_window_data:
-            maintenance_window_body["Description"].append(str(maintenance_window_data["Description"]))
-        response = self.post_request(self.root_uri + maintenance_window_url, maintenance_window_body)
+            maintenance_window_body["Description"].append(
+                str(maintenance_window_data["Description"]))
+        response = self.post_request(
+            self.root_uri + maintenance_window_url, maintenance_window_body)
 
         if not response["ret"]:
             return response
 
-        data = response["resp"]        
+        data = response["resp"]
 
         json_data = json.loads(data.read().decode('utf-8'))
         maintenance_window_id = json_data["Id"]
@@ -4120,31 +4211,33 @@ class iLOOemUtils(RedfishUtils):
             "ret": True,
             "changed": True,
             "msg": maintenance_window_id
-        }        
-         
+        }
+
     def get_task_queue_details(self):
         # This method outputs all the tasks present in the installation queue.
         # Get on self.root_uri + self.service_root + /UpdateService
-        response = self.get_request(self.root_uri + self.service_root + "UpdateService/")
+        response = self.get_request(
+            self.root_uri + self.service_root + "UpdateService/")
         if not response["ret"]:
             return response
 
         json_data = response["data"]
         if "Oem" not in json_data or "Hpe" not in json_data["Oem"] or \
             "UpdateTaskQueue" not in json_data["Oem"]["Hpe"] or \
-            "@odata.id" not in json_data["Oem"]["Hpe"]["UpdateTaskQueue"]:
+                "@odata.id" not in json_data["Oem"]["Hpe"]["UpdateTaskQueue"]:
             return {
                 "ret": False,
                 "changed": False,
                 "msg": "Update task queue url not found in response, %s" % (json_data)
-            }  
+            }
 
         # GET on /redfish/v1/UpdateService/UpdateTaskQueue/
         update_task_queue_url = json_data["Oem"]["Hpe"]["UpdateTaskQueue"]["@odata.id"]
-        update_task_queue_rsp = self.get_request(self.root_uri + update_task_queue_url )
+        update_task_queue_rsp = self.get_request(
+            self.root_uri + update_task_queue_url)
 
         if not update_task_queue_rsp["ret"]:
-            return update_task_queue_rsp    
+            return update_task_queue_rsp
 
         update_task_queue_rsp_data = update_task_queue_rsp["data"]
 
@@ -4159,17 +4252,18 @@ class iLOOemUtils(RedfishUtils):
                 mem_data = item_rsp["data"]
                 # storing the result in a list
                 task_queue_details.append(mem_data)
-    
+
         return {
             "ret": True,
             "changed": False,
             "msg": task_queue_details
-        }   
+        }
 
     def get_all_install_sets(self):
         # This method outputs all the install sets details present in the server.
         # Get on self.root_uri + self.service_root + /UpdateService
-        response = self.get_request(self.root_uri + self.service_root + "UpdateService/")
+        response = self.get_request(
+            self.root_uri + self.service_root + "UpdateService/")
         if not response["ret"]:
             return response
 
@@ -4177,12 +4271,12 @@ class iLOOemUtils(RedfishUtils):
 
         if "Oem" not in json_data or "Hpe" not in json_data["Oem"] or \
             "InstallSets" not in json_data["Oem"]["Hpe"] or \
-            "@odata.id" not in json_data["Oem"]["Hpe"]["InstallSets"]:
+                "@odata.id" not in json_data["Oem"]["Hpe"]["InstallSets"]:
             return {
                 "ret": False,
                 "changed": False,
                 "msg": "Install set url not found in response, %s" % (json_data)
-            }  
+            }
         install_set_url = json_data["Oem"]["Hpe"]["InstallSets"]["@odata.id"]
         # Get on self.root_uri + self.service_root + /UpdateService/InstallSets
         install_set_rsp = self.get_request(self.root_uri + install_set_url)
@@ -4208,37 +4302,39 @@ class iLOOemUtils(RedfishUtils):
             "ret": True,
             "changed": False,
             "msg": install_set_rsp_data
-        }   
+        }
 
-    def create_install_set(self,install_set_url,install_set_attributes):
+    def create_install_set(self, install_set_url, install_set_attributes):
         # This method creates new install set and outputs the same.
         # POST on self.root_uri + self.service_root + /UpdateService/InstallSets
-        # Creating install set body 
-        install_set_body = {          
-           "Name": str(install_set_attributes["Name"]),
-           "Sequence": install_set_attributes["Install_set_sequence"]
+        # Creating install set body
+        install_set_body = {
+            "Name": str(install_set_attributes["Name"]),
+            "Sequence": install_set_attributes["Install_set_sequence"]
         }
-        if(install_set_attributes["Description"]!=''):
+        if(install_set_attributes["Description"] != ''):
             install_set_body["Description"] = install_set_attributes["Description"]
 
-        response = self.post_request(self.root_uri + install_set_url, install_set_body)
+        response = self.post_request(
+            self.root_uri + install_set_url, install_set_body)
 
         if not response["ret"]:
             return response
 
-        data = response["resp"]        
-        json_data = json.loads(data.read().decode('utf-8')) 
+        data = response["resp"]
+        json_data = json.loads(data.read().decode('utf-8'))
 
         return {
             "ret": True,
             "changed": True,
-            "msg": json_data         
+            "msg": json_data
         }
 
     def get_ilo_repo_details(self):
-        # This method outputs all the file's details present in the iLO repository      
+        # This method outputs all the file's details present in the iLO repository
         # Get on self.root_uri + self.service_root + /UpdateService
-        response = self.get_request(self.root_uri + self.service_root + "UpdateService/")
+        response = self.get_request(
+            self.root_uri + self.service_root + "UpdateService/")
         if not response["ret"]:
             return response
 
@@ -4246,16 +4342,17 @@ class iLOOemUtils(RedfishUtils):
 
         if "Oem" not in json_data or "Hpe" not in json_data["Oem"] or \
             "ComponentRepository" not in json_data["Oem"]["Hpe"] or \
-            "@odata.id" not in json_data["Oem"]["Hpe"]["ComponentRepository"]:
+                "@odata.id" not in json_data["Oem"]["Hpe"]["ComponentRepository"]:
             return {
                 "ret": False,
                 "changed": False,
                 "msg": "Component repository url not found in response, %s" % (json_data)
-            }  
+            }
 
         component_repository_url = json_data["Oem"]["Hpe"]["ComponentRepository"]["@odata.id"]
         # Get on self.root_uri + self.service_root + /UpdateService/ComponentRepository
-        comp_repo_rsp = self.get_request(self.root_uri + component_repository_url)
+        comp_repo_rsp = self.get_request(
+            self.root_uri + component_repository_url)
         if not comp_repo_rsp["ret"]:
             return comp_repo_rsp
 
@@ -4278,50 +4375,51 @@ class iLOOemUtils(RedfishUtils):
             "ret": True,
             "changed": False,
             "msg": comp_repo_rsp_data
-        }           
+        }
 
-    def get_maintenance_window_id(self,maintenance_window_details):
+    def get_maintenance_window_id(self, maintenance_window_details):
         # Get maintenance window details
         resp = self.get_maintenance_window()
         if not resp["ret"]:
-            return resp 
+            return resp
         resp_data = resp["msg"]
 
         ilo_time = ''
-        response = self.get_request(self.root_uri + self.service_root )
+        response = self.get_request(self.root_uri + self.service_root)
         if not response["ret"]:
             return response
 
         if "Oem" in response["data"] and "Hpe" in response["data"]["Oem"] and "Time" in response["data"]["Oem"]["Hpe"]:
-            ilo_time = response["data"]["Oem"]["Hpe"]["Time"]    
+            ilo_time = response["data"]["Oem"]["Hpe"]["Time"]
         ilo_time = datetime.strptime(ilo_time, "%Y-%m-%dT%H:%M:%SZ")
 
-        maintenance_window_id = '' 
+        maintenance_window_id = ''
         # If startAfter and Expire time are provided then check if already exists else create new maintenance window if not present.
         if "StartAfter" in maintenance_window_details.keys() and "Expire" in maintenance_window_details.keys():
             for each in resp_data:
                 if each["Name"] == maintenance_window_details["Name"]:
                     # check start and end time
                     if maintenance_window_details["StartAfter"] != each["StartAfter"] or \
-                        maintenance_window_details["Expire"] != each["Expire"]:
+                            maintenance_window_details["Expire"] != each["Expire"]:
                         return {
                             "ret": False,
                             "changed": False,
                             "msg": "Maintenance window with same name with different start and expire time already exists in the server. Hence provide unique name for maintenance window"
                         }
-                    else: 
-                        end_time = datetime.strptime(maintenance_window_details["Expire"], "%Y-%m-%dT%H:%M:%SZ")
+                    else:
+                        end_time = datetime.strptime(
+                            maintenance_window_details["Expire"], "%Y-%m-%dT%H:%M:%SZ")
                         # Check for maintenance window will expire before it is created
                         if (ilo_time > end_time):
                             return {
                                 "ret": False,
                                 "changed": False,
-                                "msg": "Provided Expire time should be later than the iLO server time"               
+                                "msg": "Provided Expire time should be later than the iLO server time"
                             }
                         maintenance_window_id = each["Id"]
 
             if maintenance_window_id == "":
-                if len(resp_data) >=8:
+                if len(resp_data) >= 8:
                     return {
                         "ret": False,
                         "changed": False,
@@ -4332,24 +4430,26 @@ class iLOOemUtils(RedfishUtils):
                     return {
                         "ret": False,
                         "changed": False,
-                        "msg": "Provided Start and Expire time cannot be same"               
+                        "msg": "Provided Start and Expire time cannot be same"
                     }
-                resp = self.create_maintenance_window(maintenance_window_details)
+                resp = self.create_maintenance_window(
+                    maintenance_window_details)
                 if not resp["ret"]:
-                    return resp    
-                maintenance_window_id = resp["msg"]  
+                    return resp
+                maintenance_window_id = resp["msg"]
         else:
-            #If start and end time 
+            # If start and end time
             for each in resp_data:
                 if each["Name"] == maintenance_window_details["Name"]:
-                    end_time = datetime.strptime(each["Expire"], "%Y-%m-%dT%H:%M:%SZ")
+                    end_time = datetime.strptime(
+                        each["Expire"], "%Y-%m-%dT%H:%M:%SZ")
 
                     # Check for maintenance window will expire before it is created
                     if (ilo_time > end_time):
                         return {
                             "ret": False,
                             "changed": False,
-                            "msg": "Provided Expire time should be later than the iLO server time"               
+                            "msg": "Provided Expire time should be later than the iLO server time"
                         }
                     maintenance_window_id = each["Id"]
             if maintenance_window_id == "":
@@ -4362,10 +4462,10 @@ class iLOOemUtils(RedfishUtils):
         return {
             "ret": True,
             "changed": False,
-            "msg": maintenance_window_id        
+            "msg": maintenance_window_id
         }
 
-    def get_install_set_url(self,install_set_attributes):
+    def get_install_set_url(self, install_set_attributes):
         # This method upgrades the firmware through provided install set sequence
         install_set_resp = self.get_all_install_sets()
         if not install_set_resp["ret"]:
@@ -4374,32 +4474,33 @@ class iLOOemUtils(RedfishUtils):
         install_set_url = install_set_resp["msg"]["@odata.id"]
 
         found_install_set = False
-        for each_mem in install_set_resp["msg"]["Members"]:  
-            # Check name of install set name 
+        for each_mem in install_set_resp["msg"]["Members"]:
+            # Check name of install set name
             if install_set_attributes["Name"] == each_mem["Name"]:
                 found_install_set = True
-                # Check for sequence 
+                # Check for sequence
                 if (len(install_set_attributes["Install_set_sequence"]) != len(each_mem["Sequence"])):
                     return {
                         "ret": False,
                         "changed": False,
-                        "msg": "Install set with same name already exists in the server with different sequence. Hence provide unique name for install set"                         
-                    }                    
-                # Check the each task in the sequence 
+                        "msg": "Install set with same name already exists in the server with different sequence. Hence provide unique name for install set"
+                    }
+                # Check the each task in the sequence
                 for i in range(len(install_set_attributes["Install_set_sequence"])):
                     if install_set_attributes["Install_set_sequence"][i]["Filename"] != each_mem["Sequence"][i]["Filename"]:
                         return {
                             "ret": False,
                             "changed": False,
-                            "msg": "Install set with same names already exists in the server with different sequence. Hence provide unique name for install set"                         
+                            "msg": "Install set with same names already exists in the server with different sequence. Hence provide unique name for install set"
                         }
-                install_set_invoke_url = self.root_uri + each_mem["Actions"]["#HpeComponentInstallSet.Invoke"]["target"]
-                
+                install_set_invoke_url = self.root_uri + \
+                    each_mem["Actions"]["#HpeComponentInstallSet.Invoke"]["target"]
+
         # Check all the files in the sequence present in server
         ilo_resp = self.get_ilo_repo_details()
         if not ilo_resp["ret"]:
             return ilo_resp
-        
+
         for each_filename in install_set_attributes["Install_set_sequence"]:
             file_found = False
             for each in ilo_resp["msg"]["Members"]:
@@ -4409,28 +4510,30 @@ class iLOOemUtils(RedfishUtils):
                 return{
                     "ret": False,
                     "changed": False,
-                    "msg": "Provided filename %s doesn't exist in ilo repository" %(each_filename["Filename"])
+                    "msg": "Provided filename %s doesn't exist in ilo repository" % (each_filename["Filename"])
                 }
 
         if not found_install_set:
-            if len(install_set_resp["msg"]["Members"]) >=8:
+            if len(install_set_resp["msg"]["Members"]) >= 8:
                 return {
                     "ret": False,
                     "changed": False,
                     "msg": "Maximum of 8 install sets can be created. To create a new install set, please delete unneeded install sets and try again."
                 }
-            resp = self.create_install_set(install_set_url,install_set_attributes)
+            resp = self.create_install_set(
+                install_set_url, install_set_attributes)
             if not resp["ret"]:
                 return resp
-            install_set_invoke_url = self.root_uri +  resp["msg"]["Actions"]["#HpeComponentInstallSet.Invoke"]["target"]
+            install_set_invoke_url = self.root_uri + \
+                resp["msg"]["Actions"]["#HpeComponentInstallSet.Invoke"]["target"]
 
         return {
             "ret": True,
             "changed": False,
-            "msg": install_set_invoke_url        
+            "msg": install_set_invoke_url
         }
 
-    def firmware_upgrade_through_install_set(self,install_set_attributes,maintenance_window_details):
+    def firmware_upgrade_through_install_set(self, install_set_attributes, maintenance_window_details):
         # If the sequence doesn't have UpdatableBy parameter, add by default as Bmc
         for each_sequence in install_set_attributes["Install_set_sequence"]:
             each_sequence["Command"] = "ApplyUpdate"
@@ -4439,24 +4542,25 @@ class iLOOemUtils(RedfishUtils):
 
         install_set_url_rsp = self.get_install_set_url(install_set_attributes)
         if not install_set_url_rsp["ret"]:
-            return install_set_url_rsp        
+            return install_set_url_rsp
         install_set_invoke_url = install_set_url_rsp["msg"]
 
         maintenance_window_id = ''
 
-        # Check maintenance window provided 
+        # Check maintenance window provided
         if maintenance_window_details:
-            maintenance_window_id_rsp = self.get_maintenance_window_id(maintenance_window_details)
+            maintenance_window_id_rsp = self.get_maintenance_window_id(
+                maintenance_window_details)
             if not maintenance_window_id_rsp["ret"]:
-                return maintenance_window_id_rsp            
+                return maintenance_window_id_rsp
             maintenance_window_id = maintenance_window_id_rsp["msg"]
-        
+
         install_set_invoke_body = {
-               "TPMOverride": True
+            "TPMOverride": True
         }
 
         # Mapping of maintenance window id if applicable
-        if maintenance_window_id !='':
+        if maintenance_window_id != '':
             install_set_invoke_body["MaintenanceWindow"] = maintenance_window_id
 
         # Check any of the task in the sequence is running
@@ -4469,11 +4573,12 @@ class iLOOemUtils(RedfishUtils):
                 # Collect id's if the task name in installation_queue matches with task name provided in install set sequence input
                 if each_mem["Name"] == each_name["Name"]:
                     # Clear the task if it is not in running state
-                    if each_name["State"] in ["Complete","Expire","Exception","Canceled"]:
-                        del_rsp = self.delete_request(self.root_uri + each_name["@odata.id"])
+                    if each_name["State"] in ["Complete", "Expire", "Exception", "Canceled"]:
+                        del_rsp = self.delete_request(
+                            self.root_uri + each_name["@odata.id"])
                         if not del_rsp["ret"]:
                             return del_rsp
-                    else:      
+                    else:
                         return {
                             "ret": False,
                             "changed": False,
@@ -4482,17 +4587,18 @@ class iLOOemUtils(RedfishUtils):
 
         # Invoke install set
         # POST on self.root_uri + self.service_root + /UpdateService/InstallSets/ + ID + /Actions/HpeComponentInstallSet.Invoke/
-        response = self.post_request(install_set_invoke_url, install_set_invoke_body)
+        response = self.post_request(
+            install_set_invoke_url, install_set_invoke_body)
         if not response["ret"]:
             return response
 
-        # Get the current tasks present in the installation queue after the post operation 
+        # Get the current tasks present in the installation queue after the post operation
         resp = self.get_task_queue_details()
         if not resp["ret"]:
             return resp
 
         result_list = []
-        
+
         for each_name in resp["msg"]:
             result_dict = {}
             for each_mem in install_set_attributes["Install_set_sequence"]:
@@ -4506,16 +4612,17 @@ class iLOOemUtils(RedfishUtils):
             "ret": True,
             "changed": True,
             "msg": result_list
-        }   
-                
+        }
+
     def get_firmware_status(self):
         # This method checks the firmware upgrade status and outputs the state,Url and Id of the tasks.
         # Get on self.root_uri + self.service_root + /TaskService
-        response = self.get_request(self.root_uri + self.service_root + "TaskService/")
+        response = self.get_request(
+            self.root_uri + self.service_root + "TaskService/")
         if not response["ret"]:
             return response
-        
-        json_data = response["data"]  
+
+        json_data = response["data"]
         if "Tasks" not in json_data or "@odata.id" not in json_data["Tasks"]:
             return {
                 "ret": False,
@@ -4523,7 +4630,8 @@ class iLOOemUtils(RedfishUtils):
                 "msg": "'@odata.id' not found in task service response, %s" % (json_data)
             }
         # Get on self.root_uri + self.service_root + /TaskService + /Tasks
-        item_rsp = self.get_request(self.root_uri + json_data["Tasks"]["@odata.id"])
+        item_rsp = self.get_request(
+            self.root_uri + json_data["Tasks"]["@odata.id"])
         if not item_rsp["ret"]:
             return item_rsp
 
@@ -4555,18 +4663,19 @@ class iLOOemUtils(RedfishUtils):
                 return resp
             if "UpdateService.SimpleUpdate" in resp["data"]["Payload"]["TargetUri"] or \
                 "HpeiLOUpdateServiceExt.AddFromUri" in resp["data"]["Payload"]["TargetUri"] or \
-                "HpeComponentInstallSet.Invoke" in resp["data"]["Payload"]["TargetUri"]:
-                total_mem_data_ids.append(each_mem) 
+                    "HpeComponentInstallSet.Invoke" in resp["data"]["Payload"]["TargetUri"]:
+                total_mem_data_ids.append(each_mem)
 
         for each_member in total_mem_data_ids:
             task_details = {}
             curstate = ''
             task_id = ''
 
-            each_item_rsp = self.get_request(self.root_uri + each_member["@odata.id"])
+            each_item_rsp = self.get_request(
+                self.root_uri + each_member["@odata.id"])
 
             if not each_item_rsp["ret"]:
-                return each_item_rsp 
+                return each_item_rsp
 
             task_id = each_item_rsp["data"]["Id"]
             if "TaskState" in each_item_rsp["data"]:
@@ -4574,30 +4683,31 @@ class iLOOemUtils(RedfishUtils):
             else:
                 curstate = each_item_rsp["data"]["State"]
 
-
             if "Messages" in each_item_rsp["data"] and (curstate != "Completed" and curstate != "Complete") and \
-                isinstance(each_item_rsp["data"]["Messages"],list) and len(each_item_rsp["data"]["Messages"])!=0 and \
-                "MessageId" in each_item_rsp["data"]["Messages"][0]:
+                    isinstance(each_item_rsp["data"]["Messages"], list) and len(each_item_rsp["data"]["Messages"]) != 0 and \
+                    "MessageId" in each_item_rsp["data"]["Messages"][0]:
                 task_details["Msg"] = each_item_rsp["data"]["Messages"][0]["MessageId"]
             if "Result" in each_item_rsp["data"] and "MessageId" in each_item_rsp["data"]["Result"]:
-                task_details["Msg"] = each_item_rsp["data"]["Result"]["MessageId"]  
+                task_details["Msg"] = each_item_rsp["data"]["Result"]["MessageId"]
 
             # Store the result in dict
             task_details["ID"] = task_id
-            task_details["State"] = curstate 
+            task_details["State"] = curstate
             task_details["URL"] = each_member["@odata.id"]
-            
-            task_ids_status.append(task_details)            
 
-        response = self.get_request(self.root_uri + self.service_root + "UpdateService/")
+            task_ids_status.append(task_details)
+
+        response = self.get_request(
+            self.root_uri + self.service_root + "UpdateService/")
         if not response["ret"]:
             return response
 
-        json_data = response["data"]  
+        json_data = response["data"]
 
         flash_progress_percentage = 'NA'
-        if "Oem" in json_data and "Hpe" in json_data["Oem"] and "FlashProgressPercent" in json_data["Oem"]["Hpe"] :
-            flash_progress_percentage = str(json_data["Oem"]["Hpe"]["FlashProgressPercent"]) + "%"
+        if "Oem" in json_data and "Hpe" in json_data["Oem"] and "FlashProgressPercent" in json_data["Oem"]["Hpe"]:
+            flash_progress_percentage = str(
+                json_data["Oem"]["Hpe"]["FlashProgressPercent"]) + "%"
 
         if len(task_ids_status) == 0:
             return {
@@ -4612,3 +4722,36 @@ class iLOOemUtils(RedfishUtils):
             "flash_progress_percentage": flash_progress_percentage,
             "msg": task_ids_status
         }
+
+    def manage_chassis_ilo6_led(self, command, resource_uri=None):
+        if resource_uri is None:
+            resource_uri = self.chassis_uri
+
+        response = self.get_request(self.root_uri + resource_uri)
+        payload = {}
+
+        if command == "IndicatorLedOff":
+            if not response['data']['LocationIndicatorActive']:
+                return {'ret': False, 'msg': 'LED Indicator is already Off'}
+            else:
+                payload = {"LocationIndicatorActive": False}
+                resp = self.patch_request(
+                    self.root_uri + resource_uri, payload)
+                if resp['ret'] and resp['changed']:
+                    return {
+                        "ret": True,
+                        "msg": "Set IndicatorLED to Off"
+                    }
+
+        elif command == "IndicatorLedOn":
+            if response['data']['LocationIndicatorActive']:
+                return {'ret': False, 'msg': 'LED Indicator is already On'}
+            else:
+                payload = {"LocationIndicatorActive": True}
+                resp = self.patch_request(
+                    self.root_uri + resource_uri, payload)
+                if resp['ret'] and resp['changed']:
+                    return {
+                        "ret": True,
+                        "msg": "Set IndicatorLED to On"
+                    }

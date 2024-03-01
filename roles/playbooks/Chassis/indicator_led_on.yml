@@ -16,7 +16,7 @@
       register: result
 
     - name: Turn LED on
-      community.general.redfish_command:
+      ilo_device:
         category: Chassis
         command: IndicatorLedOn
         baseuri: "{{ baseuri }}"

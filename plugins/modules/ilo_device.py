@@ -17,6 +17,9 @@
 ###
 
 from __future__ import absolute_import, division, print_function
+from ansible.module_utils._text import to_native
+from ansible.module_utils.basic import AnsibleModule
+import traceback
 
 __metaclass__ = type
 
@@ -109,15 +112,13 @@ ilo_device:
     returned: always
 """
 
-CATEGORY_COMMANDS_ALL = {"Chassis": ["GetDeviceInventoryInfo"]}
+CATEGORY_COMMANDS_ALL = {"Chassis": [
+    "GetDeviceInventoryInfo", "IndicatorLedOff", "IndicatorLedOn", "IndicatorLedBlink"]}
 
 CATEGORY_COMMANDS_DEFAULT = {"Chassis": "GetDeviceInventoryInfo"}
 
 HAS_OEM_REDFISH = True
 
-import traceback
-from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils._text import to_native
 try:
     from ansible_collections.hpe.ilo.plugins.module_utils.ilo_oem_utils import iLOOemUtils, ilo_certificate_login
 except ImportError:
@@ -207,6 +208,35 @@ def main():
                 result[command] = {}
                 if command == "GetDeviceInventoryInfo":
                     result[command] = rf_utils.get_device_inventory_info()
+
+                if command in ["IndicatorLedOff", "IndicatorLedOn", "IndicatorLedBlink"]:
+                    result[command] = rf_utils._find_chassis_resource()
+                    if result[command]['ret'] is False:
+                        module.fail_json(msg=to_native(result['msg']))
+                    LED_commands = ["IndicatorLedOff",
+                                    "IndicatorLedOn", "IndicatorLedBlink"]
+                    no_of_commands = sum(
+                        [command in LED_commands for command in command_list])
+                    if no_of_commands > 1:
+                        result[command] = {
+                            'ret': False, 'msg': "Only one IndicatorLed command should be sent at a time."}
+                    else:
+                        response = rf_utils.get_request(
+                            root_uri+"/redfish/v1/Managers/1")
+                        if response['ret'] is False:
+                            module.fail_json(msg=to_native(response))
+                        version = float(response['data']['FirmwareVersion'][4] + "." + response['data']
+                                        ['FirmwareVersion'][7] + response['data']['FirmwareVersion'][9:11])
+                        if version < 6:
+                            result[command] = rf_utils.manage_chassis_indicator_led(
+                                command)
+                        else:
+                            if command == "IndicatorLedBlink":
+                                result[command] = {
+                                    'ret': False, 'msg': "This option is not avaible for iLO 6."}
+                            else:
+                                result[command] = rf_utils.manage_chassis_ilo6_led(
+                                    command)
 
     if not result[command]['ret']:
         module.fail_json(msg=to_native(result))
