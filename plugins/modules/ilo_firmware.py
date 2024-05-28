@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 ###
 # Copyright (2016-2024) Hewlett Packard Enterprise Development LP
@@ -83,61 +83,61 @@ options:
     type: str
   install_set_attributes:
     required: true
-    description: 
+    description:
       - Name, description and sequence of the install set to be created
     type: dict
     suboptions:
       install_set_name:
         required: true
-        description: 
+        description:
           - Name of the install set
         type: str
       install_set_sequence:
         required: true
-        description: 
+        description:
           - List of firmwares to be installed
         type: list
         suboptions:
           Name:
             required: true
-            description: 
+            description:
               - Name of the task
             type: str
           Filename:
             required: true
-            description: 
+            description:
               - Firmware component filename present in the iLO repository
             type: str
           UpdatableBy:
-            description: 
+            description:
               - List of update agents
             type: list
             elements: str
       Description:
-        description: 
+        description:
           - Description of the install set
         type: str
   maintenance_window_details:
     required: true
-    description: 
+    description:
       - Name, description, start and end time of maintenance window to be created
     type: dict
     suboptions:
       Name:
         required: true
-        description: 
+        description:
           - Name of the maintenance window
         type: str
       Description:
-        description: 
+        description:
           - Description of maintenance window
         type: str
       StartAfter:
-        description: 
+        description:
           - Start time of the maintenance window
         type: str
       Expire:
-        description: 
+        description:
           - End time of the maintenance window
         type: str
 author:
@@ -371,10 +371,10 @@ def main():
                 result[command] = rf_utils.firmware_upgrade_through_install_set(install_set_attributes, maintenance_window_details)
 
     elif category == "TaskService":
-            for command in command_list:
-                result[command] = {}
-                if command == "GetFirmwareStatus":
-                    result[command] = rf_utils.get_firmware_status()
+        for command in command_list:
+            result[command] = {}
+            if command == "GetFirmwareStatus":
+                result[command] = rf_utils.get_firmware_status()
 
     if not result[command]['ret']:
         module.fail_json(msg=to_native(result))

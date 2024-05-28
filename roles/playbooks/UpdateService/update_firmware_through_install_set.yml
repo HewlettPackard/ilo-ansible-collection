@@ -20,7 +20,7 @@
 
     - name: Check whether maintenance window is provided
       set_fact:
-        maintenance_window_flag : "{{ True if maintenance_window_details is defined else False}}"
+        maintenance_window_flag: "{{ True if maintenance_window_details is defined else False}}"
 
     - name: Perform firmware upgrade on the server using install set when username and password are defined
       block:

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 ###
 # Copyright (2016-2024) Hewlett Packard Enterprise Development LP
@@ -203,7 +203,7 @@ def main():
             module.fail_json(msg="Invalid Category: %s" % category)
 
         # Organize by Categories / Commands
-        if category == "Chassis":            
+        if category == "Chassis":
             for command in command_list:
                 result[command] = {}
                 if command == "GetDeviceInventoryInfo":
@@ -222,7 +222,7 @@ def main():
                             'ret': False, 'msg': "Only one IndicatorLed command should be sent at a time."}
                     else:
                         response = rf_utils.get_request(
-                            root_uri+"/redfish/v1/Managers/1")
+                            root_uri + "/redfish/v1/Managers/1")
                         if response['ret'] is False:
                             module.fail_json(msg=to_native(response))
                         version = float(response['data']['FirmwareVersion'][4] + "." + response['data']

@@ -153,10 +153,10 @@ class iLOOemUtils(RedfishUtils):
                 'urllib3'), exception=URLLIB3_IMP_ERR)
 
         if not HAS_REDFISH:
-            self.module.warn(f"missing redfish library")
+            self.module.warn("missing redfish library")
 
         if not HAS_PARAMIKO:
-            self.module.warn(f"missing paramiko library")
+            self.module.warn("missing paramiko library")
 
     def get_ilo_generation(self):
         # Get the firmware version
@@ -170,7 +170,7 @@ class iLOOemUtils(RedfishUtils):
                 "msg": "Key 'FirmwareVersion' not found in response: %s" % (resp)
             }
         fw_version = resp['FirmwareVersion']
-        ilo_gen = re.sub("\D", "", fw_version).strip()[0]
+        ilo_gen = re.sub(r"\D", "", fw_version).strip()[0]
         return {
             "ret": True,
             "ilo_gen": int(ilo_gen)
@@ -1031,7 +1031,8 @@ class iLOOemUtils(RedfishUtils):
                                             % (str(raid["Raid"]), ("Raid" + str(drive["Raid"])))
                         if len(drive["data_drives"]) != raid["DataDrives"]["DataDriveCount"]:
                             fail = True
-                            fail_message += "Physical drive count present in the input (%s) does not match with the physical drive count present in the server (%s). " \
+                            fail_message += "Physical drive count present in the input (%s) "\
+                                "does not match with the physical drive count present in the server (%s). " \
                                             % (str(raid["DataDrives"]["DataDriveCount"]), str(len(drive["data_drives"])))
                         if drive["MediaType"] != raid["DataDrives"]["DataDriveMediaType"]:
                             fail = True
@@ -1044,8 +1045,9 @@ class iLOOemUtils(RedfishUtils):
                         for data_drive in drive["data_drives"]:
                             if data_drive["CapacityGB"] < raid["DataDrives"]["DataDriveMinimumSizeGiB"]:
                                 fail = True
-                                fail_message += "Data drive minimum size present in the input (%s) does not satisfied by drive with ID (%s) with the data drive minimum size (%s). " \
-                                                % (str(raid["DataDrives"]["DataDriveMinimumSizeGiB"]), str(data_drive["Id"]), str(data_drive["CapacityGB"]))
+                                fail_message += "Data drive minimum size present in the input (%s) does not satisfied "\
+                                    "by drive with ID (%s) with the data drive minimum size (%s). " \
+                                    % (str(raid["DataDrives"]["DataDriveMinimumSizeGiB"]), str(data_drive["Id"]), str(data_drive["CapacityGB"]))
                         if fail:
                             return {
                                 "ret": False,
@@ -1084,7 +1086,7 @@ class iLOOemUtils(RedfishUtils):
         if not response["ret"]:
             return response
 
-         # Get the model
+        # Get the model
         sys_response = self.get_request(self.root_uri + self.systems_uri)
         if not sys_response["ret"]:
             return sys_response
@@ -1106,7 +1108,9 @@ class iLOOemUtils(RedfishUtils):
             return {
                 "ret": False,
                 "changed": False,
-                "msg": "The current server Boot Order contains fewer elements (%s) than the provided input Boot Order (%s)" % (str(len(server_boot_order)), str(len(input_boot_order)))
+                "msg": "The current server Boot Order contains fewer elements "
+                "(%s) than the provided input Boot Order (%s)" %
+                (str(len(server_boot_order)), str(len(input_boot_order)))
             }
 
         for i in range(0, len(input_boot_order)):
@@ -1854,7 +1858,7 @@ class iLOOemUtils(RedfishUtils):
     def delete_snmpv3_users(self, snmpv3_users):
         # This method deletes provided SNMPv3 users
 
-        if snmpv3_users == None or len(snmpv3_users) == 0:
+        if snmpv3_users is None or len(snmpv3_users) == 0:
             return {
                 "ret": False,
                 "msg": "The provided input SNMPv3 users is empty. Hence deleting SNMPv3 users failed"
@@ -3189,7 +3193,7 @@ class iLOOemUtils(RedfishUtils):
                     return {
                         "ret": False,
                         "changed": False,
-                        "msg": "'@odata.id' not found in NetworkAdapters response, %s" % (rsp_data)
+                        "msg": "'@odata.id' not found in NetworkAdapters response, %s" % (nwk_adapt_rsp_data["Members"])
                     }
                 # Get on each member eg : self.root_uri + self.service_root + /chassis/1 + /NetworkAdapters/<ID>
                 item_rsp = self.get_request(self.root_uri + item["@odata.id"])
@@ -3469,7 +3473,7 @@ class iLOOemUtils(RedfishUtils):
         if response["data"]["Members@odata.count"] == 0:
             return {
                 "ret": False,
-                "msg": "No drive found in %s. Check the iLO" % res["data"]
+                "msg": "No drive found in %s. Check the iLO" % response["data"]
             }
         # Get Members of ArrayControllers
         for mem in init_data["Members"]:
@@ -3510,7 +3514,7 @@ class iLOOemUtils(RedfishUtils):
         ca_file_data = cafile.readlines()
 
         ca_file_data = ca_file_data[ca_file_data.index(
-            "-----BEGIN CERTIFICATE-----\n"):ca_file_data.index("-----END CERTIFICATE-----\n")+1]
+            "-----BEGIN CERTIFICATE-----\n"):ca_file_data.index("-----END CERTIFICATE-----\n") + 1]
         ca_file_data = "".join(ca_file_data)
 
         payload = {
@@ -3523,7 +3527,9 @@ class iLOOemUtils(RedfishUtils):
                 return {
                     "ret": False,
                     "changed": False,
-                    "msg": "Importing trusted CA Certificate failed with response: " + res["msg"] + ". Certificate storage might be full, try again after cleaning up existing Trusted CA Certificates."
+                    "msg": "Importing trusted CA Certificate failed with response: "
+                    + res["msg"] + ". Certificate storage might be full,"
+                    " try again after cleaning up existing Trusted CA Certificates."
                 }
             else:
                 return res
@@ -3567,7 +3573,7 @@ class iLOOemUtils(RedfishUtils):
         cert_file_data = cert_file.readlines()
 
         cert_file_data = cert_file_data[cert_file_data.index(
-            "-----BEGIN CERTIFICATE-----\n"):cert_file_data.index("-----END CERTIFICATE-----\n")+1]
+            "-----BEGIN CERTIFICATE-----\n"):cert_file_data.index("-----END CERTIFICATE-----\n") + 1]
         cert_file_data = "".join(cert_file_data)
 
         payload = {
@@ -3664,7 +3670,7 @@ class iLOOemUtils(RedfishUtils):
 
         certificate_authentication_data = certificate_authentication["data"]
 
-        if certificate_authentication_data["CertificateLoginEnabled"] == True:
+        if certificate_authentication_data["CertificateLoginEnabled"] is True:
             return {
                 "ret": True,
                 "changed": False,
@@ -3807,7 +3813,7 @@ class iLOOemUtils(RedfishUtils):
         nodir = False
         error_output = ""
 
-        command = f"ls /usr/lib/{architecture}/"
+        command = "ls /usr/lib/{}/".format(architecture)
         stdin, stdout, stderr = client.exec_command(command)
         error_output = stderr.read().decode('utf-8')
         if len(error_output) > 0:
@@ -3826,7 +3832,7 @@ class iLOOemUtils(RedfishUtils):
                 if pack in package:
                     if op_sys == "apt":
                         package = package.split("_")[0]
-                    command = f'sudo -p "" {op_sys} remove -y {package}'
+                    command = 'sudo -p "" {} remove -y {}'.format(op_sys, package)
                     stdin, stdout, stderr = client.exec_command(
                         command, get_pty=True)
                     stdin.write(sudo_password + '\n')
@@ -3840,7 +3846,7 @@ class iLOOemUtils(RedfishUtils):
                     break
 
             if found:
-                command = f'sudo -p "" rm -f /usr/lib/{architecture}/scexe-compat/*'
+                command = 'sudo -p "" rm -f /usr/lib/{}/scexe-compat/*'.format(architecture)
                 stdin, stdout, stderr = client.exec_command(
                     command, get_pty=True)
                 stdin.write(sudo_password + '\n')
@@ -3852,7 +3858,7 @@ class iLOOemUtils(RedfishUtils):
                     return result
                 found = False
 
-        command = f'sudo -p "" {op_sys} install -y {remote}{filename}'
+        command = 'sudo -p "" {} install -y {}{}'.format(op_sys, remote, filename)
         stdin, stdout, stderr = client.exec_command(command, get_pty=True)
         stdin.write(sudo_password + '\n')
         stdin.flush()
@@ -3979,7 +3985,7 @@ class iLOOemUtils(RedfishUtils):
             result["msg"] = "Architecture not supported."
             return result
 
-        command = "ls /usr/lib/"+smcp_file+"/scexe-compat"
+        command = "ls /usr/lib/" + smcp_file + "/scexe-compat"
         stdin, stdout, stderr = client.exec_command(command)
         smart_component = stdout.read().decode('utf-8')
         error_output = stderr.read().decode('utf-8')
@@ -4059,11 +4065,15 @@ class iLOOemUtils(RedfishUtils):
             return ilo_repo_rsp
 
         for each_file_name in ilo_repo_rsp["msg"]["Members"]:
-            if((each_file_name["Filename"] == file_name or (file_name == '' and each_file_name["Filename"] == image_uri.split('/')[-1])) and each_file_name["Locked"]):
+            if ((each_file_name["Filename"] == file_name or
+                (file_name == '' and each_file_name["Filename"] == image_uri.split('/')[-1]))
+                    and each_file_name["Locked"]):
                 return {
                     "ret": False,
                     "changed": False,
-                    "msg": "The file with name '%s' already exists in the repository and is locked. Remove the install set or task that is locking the component and try again." % (each_file_name["Filename"])
+                    "msg": "The file with name '%s' already exists in the repository and is locked."
+                    " Remove the install set or task that is locking the component and try again."
+                    % (each_file_name["Filename"])
                 }
 
         update_url = self.root_uri + \
@@ -4075,7 +4085,7 @@ class iLOOemUtils(RedfishUtils):
             "TPMOverrideFlag": True
         }
 
-        if(file_name != ''):
+        if (file_name != ''):
             body["ComponentFileName"] = file_name
 
         response = self.post_request(update_url, body)
@@ -4164,7 +4174,7 @@ class iLOOemUtils(RedfishUtils):
         end_time = datetime.strptime(
             maintenance_window_data["Expire"], "%Y-%m-%dT%H:%M:%SZ")
 
-        if(start_time > end_time):
+        if (start_time > end_time):
             return {
                 "ret": False,
                 "changed": False,
@@ -4312,7 +4322,7 @@ class iLOOemUtils(RedfishUtils):
             "Name": str(install_set_attributes["Name"]),
             "Sequence": install_set_attributes["Install_set_sequence"]
         }
-        if(install_set_attributes["Description"] != ''):
+        if (install_set_attributes["Description"] != ''):
             install_set_body["Description"] = install_set_attributes["Description"]
 
         response = self.post_request(
@@ -4404,7 +4414,8 @@ class iLOOemUtils(RedfishUtils):
                         return {
                             "ret": False,
                             "changed": False,
-                            "msg": "Maintenance window with same name with different start and expire time already exists in the server. Hence provide unique name for maintenance window"
+                            "msg": "Maintenance window with same name with different start and expire time"
+                            "already exists in the server. Hence provide unique name for maintenance window"
                         }
                     else:
                         end_time = datetime.strptime(
@@ -4507,7 +4518,7 @@ class iLOOemUtils(RedfishUtils):
                 if each_filename["Filename"] == each["Filename"]:
                     file_found = True
             if not file_found:
-                return{
+                return {
                     "ret": False,
                     "changed": False,
                     "msg": "Provided filename %s doesn't exist in ilo repository" % (each_filename["Filename"])
