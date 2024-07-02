@@ -177,7 +177,6 @@ class iLOOemUtils(RedfishUtils):
         }
 
     def preparefwpkg(self, fwpkg_file):
-
         imagefiles = []
         tempdir = tempfile.mkdtemp()
 
@@ -186,7 +185,7 @@ class iLOOemUtils(RedfishUtils):
             zfile.extractall(tempdir)
             zfile.close()
         except Exception as excp:
-            raise InvalidFileInputError("Unable to unpack file. " + str(excp))
+            raise InvalidFileInputError("Unable to unpack file. " + str(excp)) from excp
 
         files = os.listdir(tempdir)
 
@@ -195,16 +194,13 @@ class iLOOemUtils(RedfishUtils):
                 data = pfile.read()
             payloaddata = json.loads(data)
         else:
-            raise InvalidFileInputError(
-                "Unable to find payload.json in fwpkg file.")
+            raise InvalidFileInputError("Unable to find payload.json in fwpkg file.")
 
         comptype = self.get_comp_type(payloaddata)
 
-        results = self.get_request(
-            self.root_uri + self.service_root + "UpdateService/")
+        results = self.get_request(self.root_uri + self.service_root + "UpdateService/")
         if not results['ret']:
-            raise UnsuccesfulRequest(
-                "Request is not completed successfully. " + str(results))
+            raise UnsuccesfulRequest("Request is not completed successfully. " + str(results))
 
         for device in payloaddata["Devices"]["Device"]:
             for firmwareimage in device["FirmwareImages"]:
@@ -310,10 +306,10 @@ class iLOOemUtils(RedfishUtils):
             try:
                 fd = open(filename, rw)
                 fd.close()
-            except IOError:
+            except IOError as exc:
                 raise InvalidFileInputError(
                     "The file '%s' could not be opened for upload" % filename
-                )
+                ) from exc
 
         maxcompsize = 32 * 1024 * 1024
         filelist = []
@@ -333,8 +329,7 @@ class iLOOemUtils(RedfishUtils):
             sigpath, t1 = os.path.split(options["componentsig"])
             check_file_rw(os.path.normpath(options["componentsig"]), "r")
             filebasename = filename[: filename.rfind(".")]
-            tempfoldername = "bmn" + \
-                "".join(choice(ascii_lowercase) for i in range(12))
+            tempfoldername = "bmn" + "".join(choice(ascii_lowercase) for i in range(12))
 
             tempdir = os.path.join(sys.executable, tempfoldername)
 
@@ -346,8 +341,7 @@ class iLOOemUtils(RedfishUtils):
                     data = component.read(maxcompsize)
                     if len(data) != 0:
                         sectionfilename = filebasename + "_part" + str(section)
-                        sectionfilepath = os.path.join(
-                            tempdir, sectionfilename)
+                        sectionfilepath = os.path.join(tempdir, sectionfilename)
 
                         sectioncompsigpath = os.path.join(
                             sigpath, sectionfilename + ".compsig"
@@ -635,25 +629,19 @@ class iLOOemUtils(RedfishUtils):
             try:
                 ret = self.uploadcomp(options)
                 if not ret['ret']:
-                    raise UploadError
+                    raise UploadError('Error uploading component.')
                 return ret
-            except UploadError:
+            except UploadError as exc:
                 if comptype in ["A", "B"]:
                     results = self.get_request(
                         self.root_uri + self.service_root + "UpdateService/")
                     if not results["ret"]:
-                        raise UnsuccesfulRequest(
-                            "Request is not completed successfully. " + str(results))
+                        raise UnsuccesfulRequest('Request is not completed successfully. ' + str(results)) from exc
 
-                    if results:
-                        check = "Error occured while uploading the firmware"
-                        raise UnsuccesfulRequest(check)
-                    else:
-                        raise FirmwareUpdateError(
-                            "Error occurred while updating the firmware."
-                        )
+                    check = "Error occured while uploading the firmware"
+                    raise UnsuccesfulRequest(check) from exc
                 else:
-                    raise UploadError("Error uploading component.")
+                    raise UploadError('Error uploading component.') from exc
 
     def flash_firmware(self, options):
         resource = self._find_managers_resource()
