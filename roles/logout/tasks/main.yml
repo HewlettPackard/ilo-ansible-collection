@@ -1,6 +1,6 @@
 ---
 # tasks file for Logout
-- name: Delete session using security token created by CreateSesssion above
+- name: Delete session using security token created by CreateSession above
   community.general.redfish_command:
     category: Sessions
     command: DeleteSession
