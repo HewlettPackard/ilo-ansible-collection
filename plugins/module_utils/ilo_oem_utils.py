@@ -950,10 +950,10 @@ class iLOOemUtils(RedfishUtils):
             result["logical_drives"] = logical_drives
             result["logical_drives_count"] = logical_drives_count
 
-            return {
-                "msg": result,
-                "ret": True
-            }
+        return {
+            "msg": result,
+            "ret": True
+        }
 
     def remove_odata(self, output):
         # Remove odata variables given in the list
