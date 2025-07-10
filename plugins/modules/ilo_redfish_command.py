@@ -59,7 +59,6 @@ options:
     default: 10
     type: int
   fwpkg_file:
-    required: true
     description:
       - Absolute path of the firmware package file that the user wishes to attach.
   force:
